@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가전 목록</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 1200px;
+      width: 100%;
+    }
+    
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    th {
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+    
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e0e0e0;
+      color: #555;
+      vertical-align: middle;
+    }
+    
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:hover {
+      background-color: #f5f5f5;
+      transform: translateX(5px);
+    }
+    
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    a {
+      display: inline-block;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 0.85em;
+    }
+    
+    a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    
+    .image-cell {
+      width: 70px;
+      text-align: center;
+    }
+    
+    .image-cell img {
+      max-width: 60px;
+      max-height: 60px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .image-cell img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .image-placeholder {
+      width: 60px;
+      height: 60px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65em;
+      color: #999;
+      margin: 0 auto;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow: auto;
+      animation: slideIn 0.3s;
+      position: relative;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: color 0.3s;
+    }
+    
+    .close-btn:hover {
+      color: #333;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+      }
+      
+      th, td {
+        padding: 8px;
+        font-size: 0.85em;
+      }
+
+      .image-cell {
+        width: 50px;
+      }
+
+      .image-placeholder {
+        width: 50px;
+        height: 50px;
+        font-size: 0.6em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="back-button">
+      <a href="index.html">← 돌아가기</a>
+    </div>
+    
+    <h1>✅ 가전 목록</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 70px;">사진</th>
+          <th>종류</th>
+          <th>제품</th>
+          <th>설치위치</th>
+          <th>링크</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/냉장고.jpg" alt="냉장고" onclick="openModal(this)">
+          </td>
+          <td>냉장고</td>
+          <td>BESPOKE 냉장고 4도어 852L (빅아이스/큐브)<br>RF85B94J2AP</td>
+          <td>주방</td>
+          <td><a href="https://www.samsung.com/sec/support/model/RF85B94J2AP/" target="_blank">Samsung 링크</a></td>
+          <td>사이즈 : 912×1,853×930 mm<br>설치 규격 : <a href="https://downloadcenter.samsung.com/content/UM/202307/20230703133808900/REF_RF9000B_2022_RF8560B_OID51119_KO_230703.pdf" target="_blank">매뉴얼 PDF</a></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/후드일체형인덕션.jpg" alt="후드일체형인덕션" onclick="openModal(this)">
+          </td>
+          <td>후드일체형인덕션</td>
+          <td>스트로만 후드일체형인덕션4구 엘리제</td>
+          <td>주방</td>
+          <td><a href="https://stromann.co.kr/product/%EA%B3%B5%ED%99%88-20%EB%A7%8C%EC%9B%90%ED%95%A0%EC%9D%B8-%EB%8F%85%EC%9D%BC%EC%8A%A4%ED%8A%B8%EB%A1%9C%EB%A7%8C-%ED%9B%84%EB%93%9C%EC%9D%BC%EC%B2%B4%ED%98%95%EC%9D%B8%EB%8D%95%EC%85%984%EA%B5%AC-%EC%A0%84%EA%B5%AD%EB%AC%B4%EB%A3%8C%EB%B0%B0%EC%86%A1%EC%84%A4%EC%B9%98-kc%ED%95%9C%EA%B5%AD%EC%A0%95%EC%8B%9D/20/category/24/display/1/" target="_blank">스트로만공식홈페이지</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/식기세척기.jpg" alt="식기세척기" onclick="openModal(this)">
+          </td>
+          <td>식기세척기</td>
+          <td>삼성 Infinite AI 식기세척기 빌트인 14인용 트루빌트인 DW99F79E1B00S</td>
+          <td>주방</td>
+          <td><a href="https://www.samsung.com/sec/dishwashers/true-built-in-dw99f79e1b00s-d2c/DW99F79E1B00S/#" target="_blank">Samsung 링크</a></td>
+          <td>설치 규격 체크<br>걸레받이 체크<br>제품 설치하기</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/로봇청소기.jpg" alt="로봇청소기" onclick="openModal(this)">
+          </td>
+          <td>로봇청소기</td>
+          <td>로보락 S10 MaxV Ultra 직배수 스테이션</td>
+          <td>주방</td>
+          <td><a href="https://kr.roborock.com/pages/roborock-s10-maxv-ultra" target="_blank">Roborock 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/음식물처리기.jpg" alt="음식물처리기" onclick="openModal(this)">
+          </td>
+          <td>음식물처리기</td>
+          <td>미닉스 음식물 처리기 더플렌더 MAX 가정용 분쇄기 건조기 MNFD-200G</td>
+          <td>주방발코니</td>
+          <td><a href="https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=B000000248474" target="_blank">올리브영 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/정수기.jpg" alt="정수기" onclick="openModal(this)">
+          </td>
+          <td>정수기</td>
+          <td>Bespoke 정수기 일체형 (냉/온/정수)+브루어 키트+교체용 필터 1SET</td>
+          <td>주방</td>
+          <td><a href="https://www.samsung.com/sec/water-purifier/package-rwp54421bf7mcf-d2c/RWP54421BF7MCF/" target="_blank">Samsung 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/환풍기.jpg" alt="욕실환풍기" onclick="openModal(this)">
+          </td>
+          <td>욕실환풍기</td>
+          <td>하츠 온풍 제습 복합 욕실 화장실 환풍기 티오람미니 HMF-J300</td>
+          <td>욕실(거실/안방)</td>
+          <td><a href="https://smartstore.naver.com/haatzgoodsmall/products/11658127406?nl-query=%ED%95%98%EC%B8%A0+%ED%8B%B0%EC%98%A4%EB%9E%8C%EB%AF%B8%EB%8B%88&nl-ts-pid=jjCbbwqo6Dv3WrVW4ZN-333948&NaPm=ct%3Dmmcysd68%7Cci%3D5b6030cc649f60ff71bd619566d9b18ed09869f6%7Ctr%3Dslssp%7Csn%3D7027228%7Chk%3D35f409972fbdf58f121f196d35676f2f8b3ed687" target="_blank">하츠정품몰</a></td>
+          <td>천장 타공 사이즈 체크<br>천장 위 공간(설치 공간 여유) 체크<br>천장 재질 체크</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <div class="image-placeholder">이미지<br>미정</div>
+          </td>
+          <td>비데</td>
+          <td>(미정)</td>
+          <td>욕실(거실/안방)</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/전자레인지.jpg" alt="전자레인지" onclick="openModal(this)">
+          </td>
+          <td>전자레인지</td>
+          <td>삼성 비스포크 전자레인지 23L 스마트쿡 SKUMG23A5378CF</td>
+          <td>주방</td>
+          <td><a href="https://www.samsung.com/sec/micro-wave-ovens/MG23A5378CU-d2c/MG23A5378CF/" target="_blank">Samsung 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/밥솥.jpg" alt="밥솥" onclick="openModal(this)">
+          </td>
+          <td>밥솥</td>
+          <td>쿠쿠 CRP-RT069FW</td>
+          <td>주방발코니</td>
+          <td><a href="https://smartstore.naver.com/hyundaihomeshopping/products/8681985884?nl-ts-pid=jjC5ndqqccjeffuOTXG-161973&nl-au=5634505d4a2a41d18a01c51320af2201&NaPm=ct%3Dmmcz9ts4%7Cci%3DER8288fcb7%2D184d%2D11f1%2D8b00%2Dce3b45465a17%7Ctr%3Dpla%7Chk%3Df79d6ac255b56d6a16cb537fd1d9ed38f9d35691%7Cnacn%3DmS50B8w7Qwjn" target="_blank">현대홈쇼핑</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/오븐겸에어프라이어.jpg" alt="오븐겸에어프라이기" onclick="openModal(this)">
+          </td>
+          <td>오븐겸에어프라이기</td>
+          <td>마키나랩 내부 올스테인레스 대용량 25L 에어프라이어오븐_블랙</td>
+          <td>주방발코니</td>
+          <td><a href="https://www.11st.co.kr/products/6922029623?NaPm=ct%3Dmmczapo0%7Cci%3D05f095f3b1582c335b4aebfe25e43da6d8d85710%7Ctr%3Dslsl%7Csn%3D17703%7Chk%3D4f64c039c249ec21e91c34326a5bd370bc1662bf&utm_term=&utm_campaign=%B3%D7%C0%CC%B9%F6pc_%B0%A1%B0%DD%BA%F1%B1%B3%B1%E2%BA%BB&utm_source=%B3%D7%C0%CC%B9%F6_PC_PCS&utm_medium=%B0%A1%B0%DD%BA%F1%B1%B3" target="_blank">마키나랩 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/커피포트.jpg" alt="커피머신" onclick="openModal(this)">
+          </td>
+          <td>커피머신</td>
+          <td>네스프레소 오리지널 커피머신</td>
+          <td>주방</td>
+          <td><a href="https://www.nespresso.com/kr/ko/order/machines/original/citiz-white-ref-jan" target="_blank">네스프레소 코리아</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/커피머신.jpg" alt="커피포트" onclick="openModal(this)">
+          </td>
+          <td>커피포트</td>
+          <td>발뮤다 더 팟 전기포트</td>
+          <td>주방</td>
+          <td><a href="https://www.balmuda.co.kr/goods/goods_view.php?goodsNo=646" target="_blank">BALMUDA 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/청소기.jpg" alt="청소기" onclick="openModal(this)">
+          </td>
+          <td>청소기</td>
+          <td>LG 코드제로 오브제컬렉션</td>
+          <td>작은방 or 현관</td>
+          <td><a href="https://www.lge.co.kr/vacuum-cleaners/a737wa" target="_blank">LG 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/공기청정기.jpg" alt="공기청정기" onclick="openModal(this)">
+          </td>
+          <td>공기청정기</td>
+          <td>LG전자 퓨리케어 공기청정기 AS120VWLC</td>
+          <td>거실</td>
+          <td><a href="https://www.lge.co.kr/air-purifier/as120vwlc?sKwd=AS120VWLC&sTab=unit_product_list&sRank=1" target="_blank">LG 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/세탁기건조기.jpg" alt="세탁기, 건조기" onclick="openModal(this)">
+          </td>
+          <td>세탁기, 건조기</td>
+          <td>삼성 비스포크 AI 세탁기+건조기 25/20kg (올인원컨트롤)</td>
+          <td>주방발코니</td>
+          <td><a href="https://www.samsung.com/sec/washing-machines/package-wf25d20cbba-d2c/WF25D20CBBA/" target="_blank">Samsung 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/시스템에어컨.jpg" alt="시스템에어컨" onclick="openModal(this)">
+          </td>
+          <td>시스템에어컨</td>
+          <td>삼성 가정용 무풍 시스템에어컨 114.6㎡ 4실 AJ30CSS4P36SSY</td>
+          <td>거실/방3</td>
+          <td><a href="https://www.samsung.com/sec/system-air-conditioners/package-aj30css4p36ssy-d2c/AJ30CSS4P36SSY/" target="_blank">Samsung 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/appliances/에어드레서.jpg" alt="에어드레서" onclick="openModal(this)">
+          </td>
+          <td>에어드레서</td>
+          <td>삼성 BESPOKE 에어드레서 대용량</td>
+          <td>작은방</td>
+          <td><a href="https://www.samsung.com/sec/support/model/DF10A9500EG/" target="_blank">Samsung 링크</a></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <div class="image-placeholder">이미지<br>미정</div>
+          </td>
+          <td>실링팬</td>
+          <td>(미정) 52인치 실링팬</td>
+          <td>거실</td>
+          <td></td>
+          <td>*목공 전까지 정해서 공유 필요*</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 이미지 모달 -->
+  <div id="imageModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <img id="modalImage" src="" alt="">
+    </div>
+  </div>
+
+  <script>
+    function openModal(imgElement) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      modalImg.src = imgElement.src;
+      modal.classList.add('show');
+    }
+
+    function closeModal(event) {
+      const modal = document.getElementById('imageModal');
+      if (event && event.target !== modal) return;
+      modal.classList.remove('show');
+    }
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
