@@ -118,6 +118,36 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
     }
+
+    .schedule-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .schedule-card {
+      border: 1px solid #e3e7ff;
+      background: #f8f9ff;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: left;
+    }
+
+    .schedule-card h3 {
+      margin: 0 0 8px 0;
+      color: #444;
+      font-size: 0.9em;
+    }
+
+    .schedule-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #555;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
     
     @media (max-width: 600px) {
       .container {
@@ -138,6 +168,14 @@
         padding: 12px;
         font-size: 0.95em;
       }
+
+      .schedule-card {
+        padding: 12px;
+      }
+
+      .schedule-summary {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -155,6 +193,18 @@
            onmouseover="this.style.transform='scale(1.05)'"
            onmouseout="this.style.transform='scale(1)'">
     </div>
+
+    <!-- 일정 자동 요약/표 섹션 -->
+    <div class="schedule-summary">
+      <div class="schedule-card">
+        <h3 id="todayTitle">오늘 일정</h3>
+        <ul id="todayList" class="schedule-list"></ul>
+      </div>
+      <div class="schedule-card">
+        <h3>다가오는 일정</h3>
+        <ul id="upcomingList" class="schedule-list"></ul>
+      </div>
+    </div>
     
     <!-- 모달 팝업 (body 닫기 전에 추가) -->
     <div id="imageModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
@@ -165,6 +215,186 @@
     </div>
     
     <script>
+      const fallbackScheduleData = {
+        offDays: '토요일, 일요일',
+        overall: '2026-03-04 ~ 2026-04-14',
+        rows: [
+          { period: '3/4~3/6', task: '일반철거 + 방수', note: '3/4: 에어컨 기사 방문 (실측)' },
+          { period: '3/9', task: '마루철거', note: '' },
+          { period: '3/10', task: '에어컨 선배관', note: '3/10: 에어컨 기사 방문' },
+          { period: '3/11~3/13', task: '목공', note: '' },
+          { period: '3/12', task: '전기입선, 터닝도어 시공', note: '' },
+          { period: '3/16~3/18', task: '필름', note: '' },
+          { period: '3/19', task: '현장 정리', note: '' },
+          { period: '3/20~3/24', task: '타일', note: '' },
+          { period: '3/25~3/27', task: '도배', note: '3/25: 문플러스 실측' },
+          { period: '3/27', task: '케라폭시', note: '' },
+          { period: '3/28~3/30', task: '케라폭시 양생', note: '주말 동안 양생' },
+          { period: '3/30', task: '발코니 탄성코드, 전기 1차 마감', note: '' },
+          { period: '3/31~4/1', task: '가구', note: '' },
+          { period: '3/31', task: '욕실 천정, 욕실 집기', note: '' },
+          { period: '4/1', task: '주방 상판 실측', note: '' },
+          { period: '4/2', task: '마루', note: '' },
+          { period: '4/3', task: '전기 2차 마감, 에어컨 설치', note: '' },
+          { period: '4/6', task: '전기 2차 마감', note: '' },
+          { period: '4/7', task: '잔마감 & 짐빼기', note: '' },
+          { period: '4/8', task: '주방 상판 시공', note: '' },
+          { period: '4/9', task: '입주청소', note: '입주청소 - 청년크린 010-9902-5247' },
+          { period: '4/10', task: '마감실리콘', note: '' },
+          { period: '4/13', task: '가전/가구 배송, 커튼 시공, 소품 셋팅, 인수인계', note: '' },
+          { period: '4/14', task: '사진, 영상 촬영', note: '' }
+        ]
+      };
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      function toDateOnly(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+
+      function parseDateToken(token, baseYear) {
+        const trimmed = token.trim();
+        const fullMatch = trimmed.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})$/);
+        if (fullMatch) {
+          return new Date(Number(fullMatch[1]), Number(fullMatch[2]) - 1, Number(fullMatch[3]));
+        }
+
+        const mdMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})$/);
+        if (mdMatch) {
+          return new Date(baseYear, Number(mdMatch[1]) - 1, Number(mdMatch[2]));
+        }
+
+        return null;
+      }
+
+      function parsePeriod(periodText, baseYear) {
+        const [startRaw, endRaw] = periodText.split('~').map((v) => v.trim());
+        const startDate = parseDateToken(startRaw, baseYear);
+        const endDate = parseDateToken(endRaw || startRaw, baseYear);
+        if (!startDate || !endDate) {
+          return null;
+        }
+        return {
+          startDate: toDateOnly(startDate),
+          endDate: toDateOnly(endDate)
+        };
+      }
+
+      function parseScheduleMarkdown(mdText) {
+        const lines = mdText.split(/\r?\n/);
+        const offDays = (lines.find((line) => line.startsWith('- 작업 없음:')) || '').replace('- 작업 없음:', '').trim();
+        const overall = (lines.find((line) => line.startsWith('- 전체 일정:')) || '').replace('- 전체 일정:', '').trim();
+
+        const tableLines = lines
+          .map((line) => line.trim())
+          .filter((line) => line.startsWith('|'));
+
+        const rows = [];
+        tableLines.forEach((line) => {
+          if (/^\|[-\s|:]+\|$/.test(line)) {
+            return;
+          }
+          const parts = line
+            .split('|')
+            .slice(1, -1)
+            .map((part) => part.trim());
+
+          if (parts.length >= 3 && parts[0] !== '일정') {
+            rows.push({
+              period: parts[0],
+              task: parts[1],
+              note: parts[2]
+            });
+          }
+        });
+
+        if (!rows.length) {
+          return null;
+        }
+
+        return {
+          offDays: offDays || fallbackScheduleData.offDays,
+          overall: overall || fallbackScheduleData.overall,
+          rows
+        };
+      }
+
+      async function loadScheduleData() {
+        try {
+          const response = await fetch('schedule.md', { cache: 'no-cache' });
+          if (!response.ok) {
+            return fallbackScheduleData;
+          }
+          const mdText = await response.text();
+          return parseScheduleMarkdown(mdText) || fallbackScheduleData;
+        } catch (error) {
+          return fallbackScheduleData;
+        }
+      }
+
+      function renderSummaryAndTable(scheduleData) {
+        const baseYearMatch = scheduleData.overall.match(/(20\d{2})[-./]\d{1,2}[-./]\d{1,2}/);
+        const baseYear = baseYearMatch ? Number(baseYearMatch[1]) : new Date().getFullYear();
+        const today = toDateOnly(new Date());
+
+        const normalizedRows = scheduleData.rows
+          .map((row) => {
+            const parsed = parsePeriod(row.period, baseYear);
+            if (!parsed) {
+              return null;
+            }
+            return {
+              ...row,
+              startDate: parsed.startDate,
+              endDate: parsed.endDate
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.startDate - b.startDate);
+
+        const todayRows = normalizedRows.filter((row) => row.startDate <= today && row.endDate >= today);
+        const upcomingRows = normalizedRows.filter((row) => row.startDate > today).slice(0, 4);
+        const isWeekend = today.getDay() === 0 || today.getDay() === 6;
+
+        const todayTitle = document.getElementById('todayTitle');
+        const todayList = document.getElementById('todayList');
+        const upcomingList = document.getElementById('upcomingList');
+
+        const todayLabel = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        todayTitle.textContent = `오늘 일정 (${todayLabel})`;
+
+        if (todayRows.length) {
+          todayList.innerHTML = todayRows
+            .map((row) => `<li><strong>${escapeHtml(row.period)}</strong> - ${escapeHtml(row.task)}${row.note ? ` <span>(${escapeHtml(row.note)})</span>` : ''}</li>`)
+            .join('');
+        } else {
+          const noWorkText = isWeekend
+            ? `오늘은 작업 없음 (${escapeHtml(scheduleData.offDays)})`
+            : '오늘 등록된 작업 일정이 없습니다';
+          todayList.innerHTML = `<li>${noWorkText}</li>`;
+        }
+
+        if (upcomingRows.length) {
+          upcomingList.innerHTML = upcomingRows
+            .map((row) => `<li><strong>${escapeHtml(row.period)}</strong> - ${escapeHtml(row.task)}${row.note ? ` <span>(${escapeHtml(row.note)})</span>` : ''}</li>`)
+            .join('');
+        } else {
+          upcomingList.innerHTML = '<li>다가오는 일정이 없습니다</li>';
+        }
+      }
+
+      async function initializeScheduleSection() {
+        const scheduleData = await loadScheduleData();
+        renderSummaryAndTable(scheduleData);
+      }
+
       document.getElementById('scheduleImg').addEventListener('click', function() {
         document.getElementById('imageModal').style.display = 'flex';
       });
@@ -179,6 +409,8 @@
           closeModal();
         }
       });
+
+      initializeScheduleSection();
     </script>
 
 
