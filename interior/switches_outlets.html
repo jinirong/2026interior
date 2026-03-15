@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스위치 & 콘센트</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 1200px;
+      width: 100%;
+    }
+    
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.3em;
+      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.5px;
+    }
+    
+    h2 {
+      color: #333;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .image-section {
+      text-align: left;
+      margin-bottom: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .thumbnail-img {
+      max-width: 300px;
+      max-height: 300px;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .thumbnail-img:hover {
+      transform: scale(1.05);
+    }
+
+    .image-placeholder {
+      width: 300px;
+      height: 300px;
+      background: #f5f5f5;
+      border: 2px dashed #667eea;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1em;
+      color: #999;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .image-placeholder:hover {
+      background: #f9f9f9;
+      border-color: #764ba2;
+    }
+
+    .image-cell {
+      width: 100px;
+      text-align: center;
+    }
+
+    .image-cell img {
+      max-width: 80px;
+      max-height: 80px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .image-cell img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow: auto;
+      animation: slideIn 0.3s;
+      position: relative;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    th {
+      color: white;
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 1.05em;
+    }
+    
+    td {
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
+      color: #555;
+    }
+    
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:hover {
+      background-color: #f5f5f5;
+      transform: translateX(5px);
+    }
+    
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .back-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+      }
+      
+      h2 {
+        font-size: 1.3em;
+      }
+      
+      .subtitle {
+        font-size: 1.05em;
+        margin-bottom: 20px;
+      }
+      
+      th, td {
+        padding: 12px;
+        font-size: 0.95em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span style="color: #667eea;">🔌</span> 스위치 & 콘센트</h1>
+    <p class="subtitle">전기 설비 목록</p>
+
+    <h2>콘센트</h2>
+    <div class="image-section">
+      <img class="thumbnail-img" src="images/switches_outlets/outlets_overview.png" alt="콘센트 전체" onclick="openModal(this)">
+      <img class="thumbnail-img" src="images/switches_outlets/outlets_overview2.png" alt="콘센트 전체" onclick="openModal(this)">
+      <div style="flex-basis: 100%;"></div>
+      <img class="thumbnail-img" src="images/switches_outlets/outlets_kitchen.jpg" alt="주방 콘센트" onclick="openModal(this)">
+      <img class="thumbnail-img" src="images/switches_outlets/outlets_living.jpg" alt="거실 콘센트" onclick="openModal(this)">
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 100px;">사진</th>
+          <th>위치</th>
+          <th>개수</th>
+          <th>제품</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/주방 콘센트.png" alt="outlet_kitchen" onclick="openModal(this)">
+          </td>
+          <td>주방</td>
+          <td>2</td>
+          <td>바흐만 DUE 듀오빌트인 콘센트 스테인리스 2구</td>
+          <td>싱크대 옆 벽면 (안쪽)<br/>아일랜드 벽쪽 상판 매립</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/거실 콘센트_주방쪽.png" alt="outlet_living1" onclick="openModal(this)">
+          </td>
+          <td>거실</td>
+          <td>2</td>
+          <td>클릭 콘센트 2구 매트화이트</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/거실 콘센트_통합수구.png" alt="outlet_living2" onclick="openModal(this)">
+          </td>
+          <td>거실</td>
+          <td>2</td>
+          <td>르그랑 아펠라 통합수구 화이트<br/>(콘센트 4구 + TV + LAN 2구)</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/거실 콘센트_커튼쪽.png" alt="outlet_living3" onclick="openModal(this)">
+          </td>
+          <td>거실</td>
+          <td>2</td>
+          <td>르그랑 아펠라 기본 매립접지 2구 화이트</td>
+          <td>커튼박스 최대한 가깝게</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/욕실 콘센트.png" alt="outlet_bathroom" onclick="openModal(this)">
+          </td>
+          <td>욕실</td>
+          <td>4개 (슬라이드장 포함?)</td>
+          <td>제안서 상 방우 콘센트</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/기본 콘센트.png" alt="outlet_default" onclick="openModal(this)">
+          </td>
+          <td>그 외</td>
+          <td>n개</td>
+          <td>제안서 상 기본 콘센트</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>스위치</h2>
+    <div class="image-section">
+      <img class="thumbnail-img" src="images/switches_outlets/switches_overview.png" alt="스위치 전체" onclick="openModal(this)">
+      <div style="flex-basis: 100%;"></div>
+      <td>*드레스룸에 스위치 추가 필요</td>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 100px;">사진</th>
+          <th>위치</th>
+          <th>개수</th>
+          <th>제품</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/거실 스위치.png" alt="switch_living" onclick="openModal(this)">
+          </td>
+          <td>거실</td>
+          <td>0</td>
+          <td>기존 스위치</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/주방 스위치.png" alt="switch_kitchen" onclick="openModal(this)">
+          </td>
+          <td>주방</td>
+          <td>1</td>
+          <td>르그랑 아테오 유럽형스위치 1로 2구 소프트알루 원톤</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/방, 욕실 스위치.png" alt="switch_rooms" onclick="openModal(this)">
+          </td>
+          <td>방, 욕실</td>
+          <td>5</td>
+          <td>르그랑 아펠라 스위치 실버 <br>욕실 스위치 - FAN 표시</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/switches_outlets/기본 스위치.png" alt="switch_balcony" onclick="openModal(this)">
+          </td>
+          <td>주방 발코니</td>
+          <td>1</td>
+          <td>제안서 상 기본 스위치</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 모달 -->
+    <div id="imageModal" class="modal">
+      <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        <img id="modalImg" src="" alt="확대 이미지">
+      </div>
+    </div>
+
+    <a href="index.html" class="back-link">← 돌아가기</a>
+  </div>
+
+  <script>
+    // 섹션 이미지 클릭 시 모달 열기
+    function setupImageModal(imageId) {
+      const img = document.getElementById(imageId);
+      if (!img) return;
+      
+      img.addEventListener('click', function() {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        modalImg.src = this.src;
+        modal.classList.add('show');
+      });
+
+      // 이미지 로드 실패 시 placeholder 표시
+      img.addEventListener('error', function() {
+        const container = this.parentElement;
+        container.innerHTML = '<div class="image-placeholder">📸 이미지 준비 중입니다</div>';
+      });
+    }
+
+    // 테이블 항목 이미지 클릭 시 모달 열기 (onclick 사용)
+    function openModal(imgElement) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      modalImg.src = imgElement.src;
+      modal.classList.add('show');
+    }
+
+    // 페이지 로드 시
+    document.addEventListener('DOMContentLoaded', function() {
+      // 이미지 섹션은 onclick을 사용하므로 setupImageModal 불필요
+    });
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('imageModal').classList.remove('show');
+    }
+
+    // 모달 배경 클릭 시 닫기
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

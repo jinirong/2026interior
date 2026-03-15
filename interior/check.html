@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인테리어 - 체크필요</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h2 {
+      color: #667eea;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-size: 1.6em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    h3 {
+      color: #764ba2;
+      margin-top: 25px;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .no-item {
+      color: #999;
+      font-style: italic;
+    }
+
+    /* 체크리스트 스타일 */
+    .checklist {
+      list-style: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .checklist li:hover {
+      background-color: #f5f5f5;
+    }
+
+    .checklist-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .checklist li label {
+      cursor: pointer;
+      flex: 1;
+      color: #555;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .checklist li input[type="checkbox"]:checked + label {
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    hr {
+      margin: 40px 0;
+      border: none;
+      border-top: 2px solid #e0e0e0;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      h2 {
+        font-size: 1.3em;
+      }
+
+      h3 {
+        font-size: 1.1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✅ 체크필요 항목</h1>
+
+    <!-- 구매 필요 -->
+    <h2>구매 필요</h2>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-purchase">
+        <li>
+          <input type="checkbox" id="purchase-check1" class="checklist-checkbox" data-id="purchase-check1">
+          <label for="purchase-check1">식탁</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check2" class="checklist-checkbox" data-id="purchase-check2">
+          <label for="purchase-check2">인덕션</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check3" class="checklist-checkbox" data-id="purchase-check3">
+          <label for="purchase-check3">로봇청소기</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check4" class="checklist-checkbox" data-id="purchase-check4">
+          <label for="purchase-check4">식기세척기</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check5" class="checklist-checkbox" data-id="purchase-check5">
+          <label for="purchase-check5">정수기</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check6" class="checklist-checkbox" data-id="purchase-check6">
+          <label for="purchase-check6">실링팬</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check7" class="checklist-checkbox" data-id="purchase-check7">
+          <label for="purchase-check7">욕실환풍기</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check8" class="checklist-checkbox" data-id="purchase-check8">
+          <label for="purchase-check8">음식물처리기</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check9" class="checklist-checkbox" data-id="purchase-check9">
+          <label for="purchase-check9">시스템에어컨</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check10" class="checklist-checkbox" data-id="purchase-check10">
+          <label for="purchase-check10">시스템에어컨 인테리어핏키트</label>
+        </li>
+        <li>
+          <input type="checkbox" id="purchase-check10" class="checklist-checkbox" data-id="purchase-check10">
+          <label for="purchase-check10">도어락</label>
+        </li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- 현관 -->
+    <h2>현관</h2>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-entrance">
+        <li>
+          <input type="checkbox" id="entrance-check1" class="checklist-checkbox" data-id="entrance-check1">
+          <label for="entrance-check1">문플러스 실측 일정 조정 필요</label>
+        </li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- 거실 -->
+    <h2>거실</h2>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 안방 -->
+    <h2>안방</h2>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 주방 -->
+    <h2>주방</h2>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-kitchen">
+        <li>
+          <input type="checkbox" id="kitchen-check1" class="checklist-checkbox" data-id="kitchen-check1">
+          <label for="kitchen-check1">싱크대 옆 사이즈 체크 (로봇청소기장, 정수기, 음식물쓰레기)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check2" class="checklist-checkbox" data-id="kitchen-check2">
+          <label for="kitchen-check2">식세기용 가구장도어 필요</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check3" class="checklist-checkbox" data-id="kitchen-check3">
+          <label for="kitchen-check3">정수기타공위치</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check4" class="checklist-checkbox" data-id="kitchen-check4">
+          <label for="kitchen-check4">손잡이 유형</label>
+        </li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- 욕실 -->
+    <h2>욕실</h2>
+    
+    <h3>공용욕실</h3>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-bathroom">
+        <li>
+          <input type="checkbox" id="bathroom-check1" class="checklist-checkbox" data-id="bathroom-check1">
+          <label for="bathroom-check1">세면기 옆 쪽 조적벽에 행거 설치</label>
+        </li>
+      </ul>
+    </div>
+
+    <h3>안방욕실</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 작은방 -->
+    <h2>작은방</h2>
+    
+    <h3>작은방1</h3>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-small_room1">
+        <li>
+          <input type="checkbox" id="small_room-check1" class="checklist-checkbox" data-id="small_room-check1">
+          <label for="small_room-check1">이중행거 - 그림필요</label>
+        </li>
+      </ul>
+    </div>
+
+    <h3>작은방2</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 바닥재 & 마감재 -->
+    <h2>바닥재 & 마감재</h2>
+    
+    <h3>마루</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <h3>도배(벽지)</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <h3>타일</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <h3>필름</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <a href="index.html" class="back-button">← 돌아가기</a>
+  </div>
+
+  <script>
+    // 체크리스트 기능
+    function initChecklist() {
+      const checklistItems = document.querySelectorAll('.checklist-checkbox');
+      
+      // 저장된 상태 불러오기
+      checklistItems.forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
+        const isChecked = localStorage.getItem(id) === 'true';
+        if (isChecked) {
+          checkbox.checked = true;
+        }
+      });
+      
+      // 체크박스 변경 시 상태 저장
+      checklistItems.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const id = this.getAttribute('data-id');
+          localStorage.setItem(id, this.checked);
+        });
+      });
+    }
+
+    // 페이지 로드 시 체크리스트 초기화
+    initChecklist();
+  </script>
+</body>
+</html>
