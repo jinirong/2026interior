@@ -201,6 +201,81 @@
     .close-btn:hover {
       color: #333;
     }
+
+    /* Collapsible 스타일 */
+    .collapsible-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85em;
+      transition: all 0.3s ease;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 8px;
+    }
+
+    .collapsible-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .collapsible-btn.active::after {
+      content: ' ▼';
+    }
+
+    .collapsible-btn:not(.active)::after {
+      content: ' ▶';
+    }
+
+    .collapsible-content {
+      display: none;
+      padding: 12px;
+      background: #f9f9f9;
+      border-left: 4px solid #667eea;
+      border-radius: 4px;
+      margin-top: 8px;
+      line-height: 1.6;
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .collapsible-content.show {
+      display: block;
+    }
+
+    .collapsible-content h4 {
+      color: #667eea;
+      margin: 12px 0 8px 0;
+      font-weight: 600;
+    }
+
+    .collapsible-content ul {
+      margin-left: 20px;
+      padding: 0;
+    }
+
+    .collapsible-content li {
+      margin-bottom: 6px;
+    }
+
+    .collapsible-content a {
+      display: inline;
+      padding: 0;
+      background: none;
+      color: #667eea;
+      text-decoration: underline;
+      box-shadow: none;
+      font-weight: normal;
+    }
+
+    .collapsible-content a:hover {
+      text-decoration: none;
+      transform: none;
+    }
     
     @media (max-width: 768px) {
       .container {
@@ -322,7 +397,44 @@
           <td data-label="제품">스트로만 후드일체형인덕션4구 엘리제</td>
           <td data-label="설치위치">주방</td>
           <td data-label="링크"><a href="https://stromann.co.kr/product/%EA%B3%B5%ED%99%88-20%EB%A7%8C%EC%9B%90%ED%95%A0%EC%9D%B8-%EB%8F%85%EC%9D%BC%EC%8A%A4%ED%8A%B8%EB%A1%9C%EB%A7%8C-%ED%9B%84%EB%93%9C%EC%9D%BC%EC%B2%B4%ED%98%95%EC%9D%B8%EB%8D%95%EC%85%984%EA%B5%AC-%EC%A0%84%EA%B5%AD%EB%AC%B4%EB%A3%8C%EB%B0%B0%EC%86%A1%EC%84%A4%EC%B9%98-kc%ED%95%9C%EA%B5%AD%EC%A0%95%EC%8B%9D/20/category/24/display/1/" target="_blank">스트로만공식홈페이지</a></td>
-          <td data-label="비고"></td>
+          <td data-label="비고">
+            <button class="collapsible-btn" onclick="toggleCollapsible(this)">📋 규격</button>
+            <div class="collapsible-content">
+              <h4>⚡ 설치전 필요시공</h4>
+              
+              <h4>★전기공사</h4>
+              <ul>
+                <li>최대소비전력: 7.6kw 전용 전기선 4sq(4 스퀘어)</li>
+                <li>콘센트가 아닌 전기배선 직접연결되어야 함</li>
+                <li>최소 30A의 차단기가 필요</li>
+              </ul>
+
+              <h4>★싱크대 상판 타공</h4>
+              <ul>
+                <li>가로: 770mm × 세로: 490mm</li>
+              </ul>
+
+              <h4>★설치예정인 싱크대의 기본 설치 규격 조건</h4>
+              <ul>
+                <li>가로: 900mm × 세로: 600mm</li>
+                <li>최소높이: 850mm</li>
+              </ul>
+
+              <h4>★인덕션 설치위치의 하부장 서랍장</h4>
+              <ul>
+                <li>인덕션 본체(후드)가 위치할 공간이 필요</li>
+                <li>서랍장의 깊이: 30cm</li>
+                <li>최종 높이: 55cm 미만</li>
+              </ul>
+
+              <h4>📄 필수 문서 (인테리어 기사님께 전달)</h4>
+              <ul>
+                <li><a href="https://naver.me/Fc5siCgg" target="_blank">설치타공 가이드</a></li>
+                <li><a href="https://naver.me/5ixnD1h5" target="_blank">설치도면</a></li>
+                <li><a href="https://naver.me/5mImHmg0" target="_blank">제품 설명서</a></li>
+              </ul>
+            </div>
+          </td>
         </tr>
         <tr>
           <td class="image-cell" data-label="사진">
@@ -342,7 +454,27 @@
           <td data-label="제품">로보락 S10 MaxV Ultra 직배수 스테이션</td>
           <td data-label="설치위치">주방</td>
           <td data-label="링크"><a href="https://kr.roborock.com/pages/roborock-s10-maxv-ultra" target="_blank">Roborock 링크</a></td>
-          <td data-label="비고"></td>
+          <td data-label="비고">
+            <button class="collapsible-btn" onclick="toggleCollapsible(this)">📋 규격</button>
+            <div class="collapsible-content">
+              <h4>🤖 로보락 S10 MaxV Ultra</h4>
+              
+              <h4>도크 계약</h4>
+              <ul>
+                <li>너비: 409mm</li>
+                <li>깊이: 440mm</li>
+                <li>높이: 300mm</li>
+              </ul>
+
+              <h4>로봇청소기(장) 규격</h4>
+              <ul>
+                <li>너비: 420mm</li>
+                <li>깊이: 470mm</li>
+                <li>높이 (최소): 305mm</li>
+                <li>높이 (권장): 310mm</li>
+              </ul>
+            </div>
+          </td>
         </tr>
         <tr>
           <td class="image-cell" data-label="사진">
@@ -518,6 +650,13 @@
       const modal = document.getElementById('imageModal');
       if (event && event.target !== modal) return;
       modal.classList.remove('show');
+    }
+
+    // Collapsible 토글 함수
+    function toggleCollapsible(btn) {
+      const content = btn.nextElementSibling;
+      btn.classList.toggle('active');
+      content.classList.toggle('show');
     }
 
     // ESC 키로 모달 닫기

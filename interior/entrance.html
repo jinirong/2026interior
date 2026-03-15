@@ -150,6 +150,71 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 20px;
     }
+
+    /* Collapsible 스타일 */
+    .collapsible-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85em;
+      transition: all 0.3s ease;
+      margin-left: 10px;
+      margin-top: 5px;
+      display: inline-block;
+    }
+
+    .collapsible-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .collapsible-btn.active::after {
+      content: ' ▼';
+    }
+
+    .collapsible-btn:not(.active)::after {
+      content: ' ▶';
+    }
+
+    .collapsible-content {
+      display: none;
+      padding: 12px;
+      background: #f9f9f9;
+      border-left: 4px solid #667eea;
+      border-radius: 4px;
+      margin-top: 8px;
+      margin-left: 10px;
+      line-height: 1.6;
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .collapsible-content.show {
+      display: block;
+    }
+
+    .collapsible-content h4 {
+      color: #667eea;
+      margin: 12px 0 8px 0;
+      font-weight: 600;
+    }
+
+    .collapsible-content img {
+      width: 100%;
+      max-width: 400px;
+      margin: 12px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .collapsible-content img:hover {
+      transform: scale(1.02);
+    }
     
     @media (max-width: 768px) {
       .images-grid {
@@ -197,7 +262,14 @@
         </li>
         <li>중문
           <ul class="nested-list">
-            <li>문플러스 계약 완료 (3/1)</li>
+            <li>문플러스 계약 완료 (3/1)
+              <button class="collapsible-btn" onclick="toggleCollapsible(this)">📋 규격</button>
+              <div class="collapsible-content">
+                <h4>공사 가이드</h4>
+                <img src="images/materials/중문_공사가이드_1.jpg" alt="중문 공사가이드 1" onclick="openImageModal(this)">
+                <img src="images/materials/중문_공사가이드_2.jpg" alt="중문 공사가이드 2" onclick="openImageModal(this)">
+              </div>
+            </li>
           </ul>
         </li>
       </ol>
@@ -218,6 +290,19 @@
     const modal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
     const closeModal = document.querySelector('.close-modal');
+
+    // Collapsible 토글 함수
+    function toggleCollapsible(btn) {
+      const content = btn.nextElementSibling;
+      btn.classList.toggle('active');
+      content.classList.toggle('show');
+    }
+
+    // 이미지 모달 열기
+    function openImageModal(imgElement) {
+      modal.classList.add('active');
+      modalImage.src = imgElement.src;
+    }
 
     function loadImages(folderId, folderPath) {
       const container = document.getElementById(`images-${folderId}`);
