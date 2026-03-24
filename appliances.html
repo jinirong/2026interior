@@ -378,6 +378,10 @@
     const database = getDatabase(app);
 
     window.firebaseDB = database;
+    window.ref = ref;
+    window.set = set;
+    window.get = get;
+    window.onValue = onValue;
   </script>
 </head>
 <body>
