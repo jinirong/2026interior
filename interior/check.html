@@ -435,8 +435,8 @@
       let html = '';
 
       // Firebase에서 purchases 데이터 읽어오기
-      const purchasesRef = ref(db, 'purchases');
-      get(purchasesRef).then(snapshot => {
+      const purchasesRef = window.ref(db, 'purchases');
+      window.get(purchasesRef).then(snapshot => {
         const purchasesData = snapshot.val() || {};
         
         // Appliances
@@ -493,8 +493,8 @@
           checkbox.addEventListener('change', function() {
             const productId = this.getAttribute('data-product-id');
             const db = window.firebaseDB;
-            const completedRef = ref(db, `purchases/completed-${productId}`);
-            set(completedRef, this.checked).catch(error => {
+            const completedRef = window.ref(db, `purchases/completed-${productId}`);
+            window.set(completedRef, this.checked).catch(error => {
               console.error('Firebase 저장 오류:', error);
             });
             renderPurchaseList();
@@ -512,10 +512,10 @@
       
       checklistItems.forEach(checkbox => {
         const id = checkbox.getAttribute('data-id');
-        const checklistRef = ref(db, `checklist/${id}`);
+        const checklistRef = window.ref(db, `checklist/${id}`);
         
         // 초기 상태 불러오기
-        get(checklistRef).then(snapshot => {
+        window.get(checklistRef).then(snapshot => {
           if (snapshot.exists()) {
             checkbox.checked = snapshot.val();
           }
@@ -524,7 +524,7 @@
         });
         
         // 실시간 감시
-        onValue(checklistRef, (snapshot) => {
+        window.onValue(checklistRef, (snapshot) => {
           if (snapshot.exists()) {
             checkbox.checked = snapshot.val();
           }
@@ -532,8 +532,8 @@
         
         // 체크박스 변경 시 Firebase에 저장
         checkbox.addEventListener('change', function() {
-          const checklistRef = ref(db, `checklist/${id}`);
-          set(checklistRef, this.checked).catch(error => {
+          const checklistRef = window.ref(db, `checklist/${id}`);
+          window.set(checklistRef, this.checked).catch(error => {
             console.error('Firebase 저장 오류:', error);
           });
         });
@@ -547,8 +547,8 @@
       
       // Firebase purchases 변경 감시
       const db = window.firebaseDB;
-      const purchasesRef = ref(db, 'purchases');
-      onValue(purchasesRef, () => {
+      const purchasesRef = window.ref(db, 'purchases');
+      window.onValue(purchasesRef, () => {
         renderPurchaseList();
       });
     });
