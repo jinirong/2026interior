@@ -736,34 +736,29 @@
         // 구매필요 체크박스 관리
         async function initPurchaseCheckboxes() {
             const checkboxes = document.querySelectorAll('.purchase-checkbox');
-            
             // Firebase에서 상태 불러오기 및 실시간 동기화
             checkboxes.forEach(checkbox => {
                 const productId = checkbox.getAttribute('data-product-id');
                 const db = window.firebaseDB;
-                const purchaseRef = ref(db, `purchases/${productId}`);
-                
+                const purchaseRef = window.ref(db, `purchases/${productId}`);
                 // 초기 상태 불러오기
-                get(purchaseRef).then(snapshot => {
+                window.get(purchaseRef).then(snapshot => {
                     if (snapshot.exists()) {
                         checkbox.checked = snapshot.val();
                     }
                 }).catch(error => {
                     console.warn('Firebase 읽기 오류:', error);
                 });
-                
                 // 실시간 감시
-                onValue(purchaseRef, (snapshot) => {
+                window.onValue(purchaseRef, (snapshot) => {
                     if (snapshot.exists()) {
                         checkbox.checked = snapshot.val();
                     }
                 });
-                
                 // 체크박스 변경 시 Firebase에 저장
                 checkbox.addEventListener('change', function() {
-                    const db = window.firebaseDB;
-                    const purchaseRef = ref(db, `purchases/${productId}`);
-                    set(purchaseRef, this.checked).catch(error => {
+                    const purchaseRef = window.ref(db, `purchases/${productId}`);
+                    window.set(purchaseRef, this.checked).catch(error => {
                         console.error('Firebase 저장 오류:', error);
                     });
                 });
