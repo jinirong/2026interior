@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 인테리어 - 주방</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h2 {
+      color: #667eea;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .image-container {
+      width: 100%;
+      max-height: 400px;
+      overflow: hidden;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .image-container img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    
+    ul, ol {
+      margin-left: 20px;
+      line-height: 1.8;
+      color: #555;
+    }
+    
+    li {
+      margin-bottom: 10px;
+    }
+    
+    .nested-list {
+      margin-left: 20px;
+    }
+    
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .check-item {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+    
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+    }
+    
+    .modal-content img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      font-size: 40px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .close-modal:hover {
+      color: #ddd;
+    }
+    
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    /* 체크박스 스타일 */
+    .kitchen-checklist {
+      list-style: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+
+    .kitchen-checklist li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .kitchen-checklist li:hover {
+      background-color: #f5f5f5;
+    }
+
+    .kitchen-checklist input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .kitchen-checklist label {
+      cursor: pointer;
+      flex: 1;
+      color: #555;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .kitchen-checklist input[type="checkbox"]:checked + label {
+      color: #999;
+      text-decoration: line-through;
+    }
+    
+    @media (max-width: 768px) {
+      .images-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      h2 {
+        font-size: 1.2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏠 주방</h1>
+
+    <div class="section">
+      <h2>시안</h2>
+      <div id="images-kitchen" class="images-grid">수정필요</div>
+    </div>
+
+    <div class="section">
+      <h2>결정사항</h2>
+      <ol>
+        <li>필름
+          <ul class="nested-list">
+            <li>한솔 베이내추럴오크</li>
+            <li>한솔 클레이크림</li>
+          </ul>
+        </li>
+        <li>아일랜드 앞면 (거실쪽)
+          <ul class="nested-list">
+            <li>위 다운플랩장</li>
+            <li>아래 서랍</li>
+          </ul>
+        </li>
+        <li>아일랜드 뒷면
+          <ul class="nested-list">
+            <li>서랍, 여닫이로 구성</li>
+            <li>blum <del>2군데</del> → 1군데 사용 / 그 외 grass</li>
+          </ul>
+        </li>
+        <li>앞뒤 아일랜드 높이 : <del>880mm</del> → 900mm</li>
+        <li>벽 선반 
+          <ul class="nested-list">
+            <li>아일랜드에서 400, 그 위 300 띄우고 시공</li>
+          </ul>
+        </li>
+        <li>베란다 도어 : 폴딩도어</li>
+        <li>도어 유형
+          <ul class="nested-list">
+            <li>거실쪽 : 손잡이</li>
+            <li>아일랜드 뒷면(싱크대쪽) / 싱크대장 : 목찬넬</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>체크필요</h2>
+      <ul class="kitchen-checklist" id="kitchenChecklist">
+        <li>
+          <input type="checkbox" id="kitchen-check1" class="kitchen-checkbox" data-id="kitchen-check1">
+          <label for="kitchen-check1">싱크대 옆 사이즈 체크 (로봇청소기장, 정수기, 음식물쓰레기)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check2" class="kitchen-checkbox" data-id="kitchen-check2">
+          <label for="kitchen-check2">식세기용 가구장도어 필요</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check3" class="kitchen-checkbox" data-id="kitchen-check3">
+          <label for="kitchen-check3">정수기타공위치</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check4" class="kitchen-checkbox" data-id="kitchen-check4">
+          <label for="kitchen-check4">손잡이 유형</label>
+        </li>
+      </ul>
+    </div>
+
+    <a href="index.html" class="back-button">← 돌아가기</a>
+  </div>
+
+  <!-- 모달 -->
+  <div id="imageModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <img id="modalImage" src="" alt="확대 이미지">
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const closeModal = document.querySelector('.close-modal');
+
+    // 폴더 내 이미지 동적 로드
+    function loadImages(folderId, folderPath) {
+      const container = document.getElementById(`images-${folderId}`);
+      const maxImages = 50;
+      const extensions = ['jpg', 'jpeg', 'png', 'bmp'];
+
+      function tryLoadImage(index, extIndex) {
+        if (index > maxImages) return;
+        if (extIndex >= extensions.length) {
+          tryLoadImage(index + 1, 0);
+          return;
+        }
+
+        const ext = extensions[extIndex];
+        const imagePath = `${folderPath}/${folderId}_${index}.${ext}`;
+        const img = new Image();
+        
+        img.onload = function() {
+          const imgElement = document.createElement('img');
+          imgElement.src = imagePath;
+          imgElement.alt = `${folderId} 이미지 ${index}`;
+          imgElement.style.width = '100%';
+          imgElement.style.height = 'auto';
+          imgElement.style.objectFit = 'contain';
+          imgElement.style.borderRadius = '10px';
+          imgElement.style.cursor = 'pointer';
+          
+          imgElement.addEventListener('click', function() {
+            modal.classList.add('active');
+            modalImage.src = imagePath;
+          });
+          
+          container.appendChild(imgElement);
+          tryLoadImage(index + 1, 0);
+        };
+
+        img.onerror = function() {
+          tryLoadImage(index, extIndex + 1);
+        };
+
+        img.src = imagePath;
+      }
+
+      tryLoadImage(1, 0);
+    }
+    
+    // 모달 닫기
+    closeModal.addEventListener('click', function() {
+      modal.classList.remove('active');
+    });
+
+    // 모달 배경 클릭으로 닫기
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+
+    // ESC 키로 닫기
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        modal.classList.remove('active');
+      }
+    });
+    
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      loadImages('kitchen', 'images/kitchen');
+    });
+  </script>
+</body>
+</html>
