@@ -497,6 +497,7 @@
               <div class="product-item" data-custom-id="${id}">
                 <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${purchasesData[`completed-${id}`] ? 'checked' : ''}>
                 <label for="completed-${id}" style="${purchasesData[`completed-${id}`] ? 'text-decoration: line-through; color: #999;' : ''}">${id}</label>
+                <button class="delete-purchase" data-delete-id="${id}" style="margin-left:8px;background:#e74c3c;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;">삭제</button>
               </div>
             `;
           });
@@ -547,6 +548,18 @@
             }).catch(err => console.error(err));
           });
         }
+
+        // attach delete handlers for custom purchases
+        document.querySelectorAll('.delete-purchase').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-delete-id');
+            const db = window.firebaseDB;
+            // remove purchase and label
+            window.set(window.ref(db, `purchases/${id}`), null).then(() => {
+              return window.set(window.ref(db, `purchases_labels/${id}`), null);
+            }).then(() => renderPurchaseList()).catch(err => console.error(err));
+          });
+        });
       }).catch(error => {
         console.warn('Firebase 읽기 오류:', error);
       });
@@ -567,6 +580,29 @@
       label.textContent = text || id;
       li.appendChild(input);
       li.appendChild(label);
+      // if dynamic id (created by UI) allow deletion
+      if (id.includes('-dyn-')) {
+        const del = document.createElement('button');
+        del.textContent = '삭제';
+        del.style.marginLeft = '8px';
+        del.style.background = '#e74c3c';
+        del.style.color = '#fff';
+        del.style.border = 'none';
+        del.style.padding = '4px 8px';
+        del.style.borderRadius = '4px';
+        del.style.cursor = 'pointer';
+        del.className = 'delete-checklist-item';
+        del.setAttribute('data-delete-id', id);
+        li.appendChild(del);
+        del.addEventListener('click', () => {
+          const db = window.firebaseDB;
+          window.set(window.ref(db, `checklist_labels/${id}`), null).then(() => {
+            return window.set(window.ref(db, `checklist/${id}`), null);
+          }).then(() => {
+            li.remove();
+          }).catch(err => console.error(err));
+        });
+      }
       ul.appendChild(li);
 
       const db = window.firebaseDB;
@@ -624,11 +660,36 @@
         });
       }).catch(()=>{});
 
-      // attach UI to add new items per section
-      checklistItems.forEach(ul => {
-        const id = ul.id || '';
-        const sectionKey = id.replace('checklistItems-', '');
+      // attach UI to add new items per section (placed under the section title)
+      const sections = document.querySelectorAll('.section');
+      sections.forEach((section, idx) => {
+        if (section.id === 'purchaseNeededSection') return; // skip purchases area
+        // avoid adding duplicate container
+        if (section.querySelector('.add-item-container')) return;
+
+        // determine section key from previous heading (H2/H3)
+        const heading = section.previousElementSibling;
+        let sectionKey = `section${idx}`;
+        if (heading && (heading.tagName === 'H2' || heading.tagName === 'H3')) {
+          sectionKey = heading.textContent.trim().replace(/\s+/g, '_').replace(/[^\w\u3131-\uD79D_-]/g, '');
+        }
+
+        // ensure there's a checklist UL in this section
+        let ul = section.querySelector('.checklist');
+        if (!ul) {
+          // remove placeholder no-item paragraph if present
+          const noItem = section.querySelector('.no-item');
+          if (noItem) noItem.remove();
+          ul = document.createElement('ul');
+          ul.className = 'checklist';
+          ul.id = `checklistItems-${sectionKey}`;
+          section.insertBefore(ul, section.firstChild);
+        } else {
+          if (!ul.id) ul.id = `checklistItems-${sectionKey}`;
+        }
+
         const container = document.createElement('div');
+        container.className = 'add-item-container';
         container.style.marginTop = '8px';
         const input = document.createElement('input');
         input.placeholder = '항목 추가';
@@ -645,7 +706,9 @@
         btn.style.border = 'none';
         container.appendChild(input);
         container.appendChild(btn);
-        ul.parentNode.insertBefore(container, ul.nextSibling);
+
+        // insert under the title (section is directly after heading)
+        section.insertBefore(container, section.firstChild);
 
         btn.addEventListener('click', () => {
           const text = input.value.trim();
