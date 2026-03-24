@@ -315,7 +315,7 @@
       <ul class="checklist" id="checklistItems-bathroom">
         <li>
           <input type="checkbox" id="bathroom-check1" class="checklist-checkbox" data-id="bathroom-check1">
-          <label for="bathroom-check1">세면기 옆 쪽 조적벽에 행거 설치</label>
+          <label for="bathroom-check1">세면기 옆 쪽 조적벽에 행거 설치  -> 공간만 만들고 따로 설치(무타공) </label>
         </li>
       </ul>
     </div>
@@ -435,69 +435,129 @@
       let html = '';
 
       // Firebase에서 purchases 데이터 읽어오기
-      const purchasesRef = ref(db, 'purchases');
-      get(purchasesRef).then(snapshot => {
+      const purchasesRef = window.ref(db, 'purchases');
+      window.get(purchasesRef).then(snapshot => {
         const purchasesData = snapshot.val() || {};
-        
-        // Appliances
-        const appliancesChecked = productData.appliances.filter(item => purchasesData[item.id] === true);
 
-        // Materials
-        const materialsChecked = productData.materials.filter(item => purchasesData[item.id] === true);
+        // collect keys that are marked as needed (exclude completed- keys)
+        const neededKeys = Object.keys(purchasesData).filter(k => !k.startsWith('completed-') && purchasesData[k] === true);
 
-        if (appliancesChecked.length === 0 && materialsChecked.length === 0) {
+        if (neededKeys.length === 0) {
           section.innerHTML = '<p class="no-item">구매 필요 항목이 없습니다</p>';
           return;
         }
 
         html = '';
 
-        // Appliances section
+        // Partition keys into known product/material IDs and custom ones
+        const applianceIds = productData.appliances.map(p => p.id);
+        const materialIds = productData.materials.map(p => p.id);
+
+        const appliancesChecked = neededKeys.filter(k => applianceIds.includes(k));
+        const materialsChecked = neededKeys.filter(k => materialIds.includes(k));
+        const customChecked = neededKeys.filter(k => !applianceIds.includes(k) && !materialIds.includes(k));
+
         if (appliancesChecked.length > 0) {
           html += '<h3 style="color: #764ba2; margin-top: 0;">가전제품</h3>';
-          appliancesChecked.forEach(item => {
-            const isCompleted = purchasesData[`completed-${item.id}`] === true;
+          appliancesChecked.forEach(id => {
+            const product = productData.appliances.find(p => p.id === id) || { name: id };
+            const isCompleted = purchasesData[`completed-${id}`] === true;
             const checkedAttr = isCompleted ? 'checked' : '';
             const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
-            
             html += `
               <div class="product-item">
-                <input type="checkbox" id="completed-${item.id}" class="completion-checkbox" data-product-id="${item.id}" ${checkedAttr}>
-                <label for="completed-${item.id}" style="${strikeClass}">${item.name}</label>
+                <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${checkedAttr}>
+                <label for="completed-${id}" style="${strikeClass}">${product.name}</label>
               </div>
             `;
           });
         }
 
-        // Materials section
         if (materialsChecked.length > 0) {
           html += '<h3 style="color: #764ba2; margin-top: 20px;">인테리어 자재</h3>';
-          materialsChecked.forEach(item => {
-            const isCompleted = purchasesData[`completed-${item.id}`] === true;
+          materialsChecked.forEach(id => {
+            const product = productData.materials.find(p => p.id === id) || { name: id };
+            const isCompleted = purchasesData[`completed-${id}`] === true;
             const checkedAttr = isCompleted ? 'checked' : '';
             const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
-            
             html += `
               <div class="product-item">
-                <input type="checkbox" id="completed-${item.id}" class="completion-checkbox" data-product-id="${item.id}" ${checkedAttr}>
-                <label for="completed-${item.id}" style="${strikeClass}">${item.name}</label>
+                <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${checkedAttr}>
+                <label for="completed-${id}" style="${strikeClass}">${product.name}</label>
               </div>
             `;
           });
         }
 
+        if (customChecked.length > 0) {
+          html += '<h3 style="color: #764ba2; margin-top: 20px;">기타 항목</h3>';
+          customChecked.forEach(id => {
+            // try to get label from purchases_labels
+            html += `
+              <div class="product-item" data-custom-id="${id}">
+                <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${purchasesData[`completed-${id}`] ? 'checked' : ''}>
+                <label for="completed-${id}" style="${purchasesData[`completed-${id}`] ? 'text-decoration: line-through; color: #999;' : ''}">${id}</label>
+                <button class="delete-purchase" data-delete-id="${id}" style="margin-left:8px;background:#e74c3c;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;">삭제</button>
+              </div>
+            `;
+          });
+        }
+
+        // add quick add UI for custom purchases
+        html = `<div style="margin-bottom:12px;"><input id="add-purchase-input" placeholder="구매 항목 추가" style="padding:6px;border:1px solid #ddd;border-radius:6px;margin-right:8px;"> <button id="add-purchase-btn" style="padding:6px 10px;border-radius:6px;background:#667eea;color:#fff;border:none;">추가</button></div>` + html;
+
         section.innerHTML = html;
+
+        // populate any labels for custom items
+        window.get(window.ref(db, 'purchases_labels')).then(lblSnap => {
+          const labels = lblSnap.val() || {};
+          customChecked.forEach(id => {
+            const el = section.querySelector(`[data-custom-id="${id}"]`);
+            if (el && labels[id]) {
+              const labelEl = el.querySelector('label');
+              if (labelEl) labelEl.textContent = labels[id];
+            }
+          });
+        }).catch(()=>{});
 
         // 체크박스 이벤트 리스너 추가
         document.querySelectorAll('.completion-checkbox').forEach(checkbox => {
           checkbox.addEventListener('change', function() {
             const productId = this.getAttribute('data-product-id');
             const db = window.firebaseDB;
-            const completedRef = ref(db, `purchases/completed-${productId}`);
-            set(completedRef, this.checked).catch(error => {
+            const completedRef = window.ref(db, `purchases/completed-${productId}`);
+            window.set(completedRef, this.checked).catch(error => {
               console.error('Firebase 저장 오류:', error);
             });
             renderPurchaseList();
+          });
+        });
+
+        // add custom purchase
+        const addBtn = document.getElementById('add-purchase-btn');
+        const addInput = document.getElementById('add-purchase-input');
+        if (addBtn) {
+          addBtn.addEventListener('click', () => {
+            const text = addInput.value.trim();
+            if (!text) return;
+            const id = `custom-${Date.now()}`;
+            const db = window.firebaseDB;
+            window.set(window.ref(db, `purchases/${id}`), true).then(() => {
+              window.set(window.ref(db, `purchases_labels/${id}`), text);
+              renderPurchaseList();
+            }).catch(err => console.error(err));
+          });
+        }
+
+        // attach delete handlers for custom purchases
+        document.querySelectorAll('.delete-purchase').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-delete-id');
+            const db = window.firebaseDB;
+            // remove purchase and label
+            window.set(window.ref(db, `purchases/${id}`), null).then(() => {
+              return window.set(window.ref(db, `purchases_labels/${id}`), null);
+            }).then(() => renderPurchaseList()).catch(err => console.error(err));
           });
         });
       }).catch(error => {
@@ -506,36 +566,161 @@
     }
 
     // 체크리스트 기능 (다른 섹션들)
-    function initChecklist() {
-      const checklistItems = document.querySelectorAll('.checklist-checkbox');
+    function createChecklistElement(id, text, checked, ul) {
+      // create li element with checkbox and label
+      const li = document.createElement('li');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.className = 'checklist-checkbox';
+      input.setAttribute('data-id', id);
+      input.id = id;
+      input.checked = !!checked;
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      label.textContent = text || id;
+      li.appendChild(input);
+      li.appendChild(label);
+      // if dynamic id (created by UI) allow deletion
+      if (id.includes('-dyn-')) {
+        const del = document.createElement('button');
+        del.textContent = '삭제';
+        del.style.marginLeft = '8px';
+        del.style.background = '#e74c3c';
+        del.style.color = '#fff';
+        del.style.border = 'none';
+        del.style.padding = '4px 8px';
+        del.style.borderRadius = '4px';
+        del.style.cursor = 'pointer';
+        del.className = 'delete-checklist-item';
+        del.setAttribute('data-delete-id', id);
+        li.appendChild(del);
+        del.addEventListener('click', () => {
+          const db = window.firebaseDB;
+          window.set(window.ref(db, `checklist_labels/${id}`), null).then(() => {
+            return window.set(window.ref(db, `checklist/${id}`), null);
+          }).then(() => {
+            li.remove();
+          }).catch(err => console.error(err));
+        });
+      }
+      ul.appendChild(li);
+
       const db = window.firebaseDB;
-      
-      checklistItems.forEach(checkbox => {
+      const checklistRef = window.ref(db, `checklist/${id}`);
+
+      // initialize state
+      window.get(checklistRef).then(snapshot => {
+        if (snapshot.exists()) input.checked = snapshot.val();
+      }).catch(()=>{});
+
+      window.onValue(checklistRef, snapshot => {
+        if (snapshot.exists()) input.checked = snapshot.val();
+      });
+
+      input.addEventListener('change', function() {
+        window.set(window.ref(db, `checklist/${id}`), this.checked).catch(err => console.error(err));
+      });
+    }
+
+    function initChecklist() {
+      const checklistItems = document.querySelectorAll('.checklist');
+      const db = window.firebaseDB;
+
+      // ensure each static checkbox is wired
+      document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
         const id = checkbox.getAttribute('data-id');
-        const checklistRef = ref(db, `checklist/${id}`);
-        
-        // 초기 상태 불러오기
-        get(checklistRef).then(snapshot => {
-          if (snapshot.exists()) {
-            checkbox.checked = snapshot.val();
-          }
-        }).catch(error => {
-          console.warn('Firebase 읽기 오류:', error);
+        if (!id) return;
+        const checklistRef = window.ref(db, `checklist/${id}`);
+        window.get(checklistRef).then(snapshot => {
+          if (snapshot.exists()) checkbox.checked = snapshot.val();
+        }).catch(()=>{});
+        window.onValue(checklistRef, snapshot => {
+          if (snapshot.exists()) checkbox.checked = snapshot.val();
         });
-        
-        // 실시간 감시
-        onValue(checklistRef, (snapshot) => {
-          if (snapshot.exists()) {
-            checkbox.checked = snapshot.val();
-          }
-        });
-        
-        // 체크박스 변경 시 Firebase에 저장
         checkbox.addEventListener('change', function() {
-          const checklistRef = ref(db, `checklist/${id}`);
-          set(checklistRef, this.checked).catch(error => {
-            console.error('Firebase 저장 오류:', error);
-          });
+          window.set(window.ref(db, `checklist/${id}`), this.checked).catch(err => console.error(err));
+        });
+      });
+
+      // Load dynamic checklist labels and render into sections
+      window.get(window.ref(db, 'checklist_labels')).then(snapshot => {
+        const labels = snapshot.val() || {};
+        // for each label id, determine section by prefix before '-dyn-' or custom
+        Object.keys(labels).forEach(itemId => {
+          const parts = itemId.split('-');
+          const sectionKey = parts[0];
+          // find ul with id starting with checklistItems-<sectionKey>
+          const ul = document.getElementById(`checklistItems-${sectionKey}`);
+          if (ul) {
+            // avoid rendering if element with that id exists
+            if (!document.getElementById(itemId)) {
+              createChecklistElement(itemId, labels[itemId], false, ul);
+            }
+          }
+        });
+      }).catch(()=>{});
+
+      // attach UI to add new items per section (placed under the section title)
+      const sections = document.querySelectorAll('.section');
+      sections.forEach((section, idx) => {
+        if (section.id === 'purchaseNeededSection') return; // skip purchases area
+        // avoid adding duplicate container
+        if (section.querySelector('.add-item-container')) return;
+
+        // determine section key from previous heading (H2/H3)
+        const heading = section.previousElementSibling;
+        let sectionKey = `section${idx}`;
+        if (heading && (heading.tagName === 'H2' || heading.tagName === 'H3')) {
+          sectionKey = heading.textContent.trim().replace(/\s+/g, '_').replace(/[^\w\u3131-\uD79D_-]/g, '');
+        }
+
+        // ensure there's a checklist UL in this section
+        let ul = section.querySelector('.checklist');
+        if (!ul) {
+          // remove placeholder no-item paragraph if present
+          const noItem = section.querySelector('.no-item');
+          if (noItem) noItem.remove();
+          ul = document.createElement('ul');
+          ul.className = 'checklist';
+          ul.id = `checklistItems-${sectionKey}`;
+          section.insertBefore(ul, section.firstChild);
+        } else {
+          if (!ul.id) ul.id = `checklistItems-${sectionKey}`;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'add-item-container';
+        container.style.marginTop = '8px';
+        const input = document.createElement('input');
+        input.placeholder = '항목 추가';
+        input.style.padding = '6px';
+        input.style.border = '1px solid #ddd';
+        input.style.borderRadius = '6px';
+        input.style.marginRight = '8px';
+        const btn = document.createElement('button');
+        btn.textContent = '추가';
+        btn.style.padding = '6px 10px';
+        btn.style.borderRadius = '6px';
+        btn.style.background = '#667eea';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        container.appendChild(input);
+        container.appendChild(btn);
+
+        // insert under the title (section is directly after heading)
+        section.insertBefore(container, section.firstChild);
+
+        btn.addEventListener('click', () => {
+          const text = input.value.trim();
+          if (!text) return;
+          const itemId = `${sectionKey}-dyn-${Date.now()}`;
+          // save label and unchecked state
+          window.set(window.ref(db, `checklist_labels/${itemId}`), text).then(() => {
+            window.set(window.ref(db, `checklist/${itemId}`), false).then(() => {
+              createChecklistElement(itemId, text, false, ul);
+              input.value = '';
+            });
+          }).catch(err => console.error(err));
         });
       });
     }
@@ -547,8 +732,8 @@
       
       // Firebase purchases 변경 감시
       const db = window.firebaseDB;
-      const purchasesRef = ref(db, 'purchases');
-      onValue(purchasesRef, () => {
+      const purchasesRef = window.ref(db, 'purchases');
+      window.onValue(purchasesRef, () => {
         renderPurchaseList();
       });
     });
