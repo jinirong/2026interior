@@ -153,6 +153,47 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 20px;
     }
+
+    /* 체크박스 스타일 */
+    .kitchen-checklist {
+      list-style: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+
+    .kitchen-checklist li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .kitchen-checklist li:hover {
+      background-color: #f5f5f5;
+    }
+
+    .kitchen-checklist input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .kitchen-checklist label {
+      cursor: pointer;
+      flex: 1;
+      color: #555;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .kitchen-checklist input[type="checkbox"]:checked + label {
+      color: #999;
+      text-decoration: line-through;
+    }
     
     @media (max-width: 768px) {
       .images-grid {
@@ -181,7 +222,7 @@
 
     <div class="section">
       <h2>시안</h2>
-      <div id="images-kitchen" class="images-grid"></div>
+      <div id="images-kitchen" class="images-grid">수정필요</div>
     </div>
 
     <div class="section">
@@ -202,17 +243,45 @@
         <li>아일랜드 뒷면
           <ul class="nested-list">
             <li>서랍, 여닫이로 구성</li>
-            <li>blum 2군데 사용 / 그 외 grass</li>
+            <li>blum <del>2군데</del> → 1군데 사용 / 그 외 grass</li>
           </ul>
         </li>
-        <li>앞뒤 아일랜드 높이 : 880mm</li>
+        <li>앞뒤 아일랜드 높이 : <del>880mm</del> → 900mm</li>
         <li>벽 선반 
           <ul class="nested-list">
             <li>아일랜드에서 400, 그 위 300 띄우고 시공</li>
           </ul>
         </li>
         <li>베란다 도어 : 폴딩도어</li>
+        <li>도어 유형
+          <ul class="nested-list">
+            <li>거실쪽 : 손잡이</li>
+            <li>아일랜드 뒷면(싱크대쪽) / 싱크대장 : 목찬넬</li>
+          </ul>
+        </li>
       </ol>
+    </div>
+
+    <div class="section">
+      <h2>체크필요</h2>
+      <ul class="kitchen-checklist" id="kitchenChecklist">
+        <li>
+          <input type="checkbox" id="kitchen-check1" class="kitchen-checkbox" data-id="kitchen-check1">
+          <label for="kitchen-check1">싱크대 옆 사이즈 체크 (로봇청소기장, 정수기, 음식물쓰레기)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check2" class="kitchen-checkbox" data-id="kitchen-check2">
+          <label for="kitchen-check2">식세기용 가구장도어 필요</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check3" class="kitchen-checkbox" data-id="kitchen-check3">
+          <label for="kitchen-check3">정수기타공위치</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check4" class="kitchen-checkbox" data-id="kitchen-check4">
+          <label for="kitchen-check4">손잡이 유형</label>
+        </li>
+      </ul>
     </div>
 
     <a href="index.html" class="back-button">← 돌아가기</a>
@@ -296,8 +365,10 @@
       }
     });
     
-    // 페이지 로드 시 이미지 로드
-    loadImages('kitchen', 'images/kitchen');
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      loadImages('kitchen', 'images/kitchen');
+    });
   </script>
 </body>
 </html>
