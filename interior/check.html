@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인테리어 - 체크필요</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h2 {
+      color: #667eea;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-size: 1.6em;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    h3 {
+      color: #764ba2;
+      margin-top: 25px;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .no-item {
+      color: #999;
+      font-style: italic;
+    }
+
+    /* 체크리스트 스타일 */
+    .checklist {
+      list-style: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .checklist li:hover {
+      background-color: #f5f5f5;
+    }
+
+    .checklist-checkbox {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .checklist li label {
+      cursor: pointer;
+      flex: 1;
+      color: #555;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .checklist li input[type="checkbox"]:checked + label {
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    hr {
+      margin: 40px 0;
+      border: none;
+      border-top: 2px solid #e0e0e0;
+    }
+
+    .product-item {
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .product-item:hover {
+      background-color: #f5f5f5;
+    }
+
+    .product-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .product-item label {
+      cursor: pointer;
+      flex: 1;
+      color: #555;
+      user-select: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .product-item input[type="checkbox"]:checked + label {
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    .category-label {
+      font-size: 0.85em;
+      color: #999;
+      margin-left: 8px;
+      font-style: italic;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      h2 {
+        font-size: 1.3em;
+      }
+
+      h3 {
+        font-size: 1.1em;
+      }
+    }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDawv_nbq55KBLfulK-cIf1DadH_xatS6g",
+      authDomain: "interior-13379.firebaseapp.com",
+      projectId: "interior-13379",
+      storageBucket: "interior-13379.firebasestorage.app",
+      messagingSenderId: "643636942253",
+      appId: "1:643636942253:web:1f442dfc5cbebc907c3d24",
+      databaseURL: "https://interior-13379-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    window.firebaseDB = database;
+    window.ref = ref;
+    window.set = set;
+    window.get = get;
+    window.onValue = onValue;
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>✅ 체크필요 항목</h1>
+
+    <!-- 입주·이사 -->
+    <h2>중요 확인사항</h2>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-moving">
+        <li>
+          <input type="checkbox" id="moving-check1" class="checklist-checkbox" data-id="moving-check1">
+          <label for="moving-check1">입주청소 예약(4/9)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="moving-check2" class="checklist-checkbox" data-id="moving-check2">
+          <label for="moving-check2">이사 예약(4/15)</label>
+        </li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- 구매 필요 -->
+    <h2>구매 필요</h2>
+    <div class="section" id="purchaseNeededSection">
+      <p class="no-item">로딩 중...</p>
+    </div>
+
+    <hr>
+
+    <!-- 현관 -->
+    <h2>현관</h2>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-entrance">
+        <li>
+          <input type="checkbox" id="entrance-check1" class="checklist-checkbox" data-id="entrance-check1">
+          <label for="entrance-check1">문플러스 실측 일정 조정 필요</label>
+        </li>
+        <li>
+          <input type="checkbox" id="entrance-check2" class="checklist-checkbox" data-id="entrance-check2">
+          <label for="entrance-check2">문플러스 실측 : 3/26</label>
+        </li>
+        <li>
+          <input type="checkbox" id="entrance-check3" class="checklist-checkbox" data-id="entrance-check3">
+          <label for="entrance-check3">문플러스 시공 : 4/8</label>
+        </li>
+        <li>
+          <input type="checkbox" id="entrance-check4" class="checklist-checkbox" data-id="entrance-check4">
+          <label for="entrance-check4">중문 손잡이 셀렉</label>
+        </li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- 거실 -->
+    <h2>거실</h2>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 안방 -->
+    <h2>안방</h2>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 주방 -->
+    <h2>주방</h2>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-kitchen">
+        <li>
+          <input type="checkbox" id="kitchen-check1" class="checklist-checkbox" data-id="kitchen-check1">
+          <label for="kitchen-check1">싱크대 옆 사이즈 체크 (로봇청소기장, 정수기, 음식물쓰레기)</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check2" class="checklist-checkbox" data-id="kitchen-check2">
+          <label for="kitchen-check2">식세기용 가구장도어 필요</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check3" class="checklist-checkbox" data-id="kitchen-check3">
+          <label for="kitchen-check3">정수기타공위치</label>
+        </li>
+        <li>
+          <input type="checkbox" id="kitchen-check4" class="checklist-checkbox" data-id="kitchen-check4">
+          <label for="kitchen-check4">손잡이 유형</label>
+        </li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- 욕실 -->
+    <h2>욕실</h2>
+    
+    <h3>공용욕실</h3>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-bathroom">
+        <li>
+          <input type="checkbox" id="bathroom-check1" class="checklist-checkbox" data-id="bathroom-check1">
+          <label for="bathroom-check1">세면기 옆 쪽 조적벽에 행거 설치  -> 공간만 만들고 따로 설치(무타공) </label>
+        </li>
+      </ul>
+    </div>
+
+    <h3>안방욕실</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 작은방 -->
+    <h2>작은방</h2>
+    
+    <h3>작은방1</h3>
+    <div class="section">
+      <ul class="checklist" id="checklistItems-small_room1">
+        <li>
+          <input type="checkbox" id="small_room-check1" class="checklist-checkbox" data-id="small_room-check1">
+          <label for="small_room-check1">이중행거(그림첨부필요) -> 진행하지X </label>
+        </li>
+      </ul>
+    </div>
+
+    <h3>작은방2</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <hr>
+
+    <!-- 바닥재 & 마감재 -->
+    <h2>바닥재 & 마감재</h2>
+    
+    <h3>마루</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <h3>도배(벽지)</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <h3>타일</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <h3>필름</h3>
+    <div class="section">
+      <p class="no-item">N/A</p>
+    </div>
+
+    <a href="index.html" class="back-button">← 돌아가기</a>
+  </div>
+
+  <script>
+    // 동적 구매필요 항목 로드
+    const productData = {
+      appliances: [
+        { id: 'app-냉장고', name: '냉장고' },
+        { id: 'app-후드일체형인덕션', name: '후드일체형인덕션' },
+        { id: 'app-식기세척기', name: '식기세척기' },
+        { id: 'app-로봇청소기', name: '로봇청소기' },
+        { id: 'app-음식물처리기', name: '음식물처리기' },
+        { id: 'app-정수기', name: '정수기' },
+        { id: 'app-욕실환풍기', name: '욕실환풍기' },
+        { id: 'app-비데', name: '비데' },
+        { id: 'app-전자레인지', name: '전자레인지' },
+        { id: 'app-밥솥', name: '밥솥' },
+        { id: 'app-오븐겸에어프라이기', name: '오븐겸에어프라이기' },
+        { id: 'app-커피머신', name: '커피머신' },
+        { id: 'app-커피포트', name: '커피포트' },
+        { id: 'app-청소기', name: '청소기' },
+        { id: 'app-공기청정기', name: '공기청정기' },
+        { id: 'app-세탁기건조기', name: '세탁기, 건조기' },
+        { id: 'app-시스템에어컨', name: '시스템에어컨' },
+        { id: 'app-에어드레서', name: '에어드레서' },
+        { id: 'app-실링팬', name: '실링팬' },
+      ],
+      materials: [
+        { id: 'mat-도어손잡이', name: '도어손잡이' },
+        { id: 'mat-양변기', name: '양변기' },
+        { id: 'mat-세면기_거실', name: '세면기 (거실)' },
+        { id: 'mat-세면대_안방', name: '세면대 (안방)' },
+        { id: 'mat-세면수전', name: '세면수전' },
+        { id: 'mat-샤워욕조수전_거실', name: '샤워욕조수전 (거실)' },
+        { id: 'mat-샤워욕조수전_안방', name: '샤워욕조수전 (안방)' },
+        { id: 'mat-슬라이드바', name: '슬라이드바' },
+        { id: 'mat-휴지걸이', name: '휴지걸이' },
+        { id: 'mat-포인트욕실옷걸이', name: '포인트 욕실옷걸이' },
+        { id: 'mat-샤워볼걸이', name: '샤워볼걸이' },
+        { id: 'mat-욕실선반', name: '욕실선반' },
+        { id: 'mat-수건걸이', name: '수건걸이' },
+        { id: 'mat-유가', name: '유가' },
+        { id: 'mat-주방수전', name: '주방수전' },
+        { id: 'mat-싱크대', name: '싱크대' },
+        { id: 'mat-욕조안전바', name: '욕조 안전바' },
+        { id: 'mat-방충망', name: '방충망' },
+        { id: 'mat-붙박이장_손잡이', name: '붙박이장 손잡이' },
+        { id: 'mat-현관장_손잡이', name: '현관장 손잡이' },
+        { id: 'mat-폴딩도어_손잡이', name: '폴딩도어 손잡이' },
+        { id: 'mat-아일랜드_손잡이', name: '아일랜드 손잡이' },
+        { id: 'mat-샤시손잡이', name: '샤시손잡이' },
+        { id: 'mat-도어스토퍼', name: '도어스토퍼' },
+        { id: 'mat-스위치', name: '스위치' },
+        { id: 'mat-콘센트', name: '콘센트' },
+        { id: 'mat-방_직부등', name: '방 직부등' },
+        { id: 'mat-발코니_직부등', name: '발코니 직부등' },
+        { id: 'mat-빨래_건조대봉', name: '빨래 건조대봉' },
+      ]
+    };
+
+    function renderPurchaseList() {
+      const section = document.getElementById('purchaseNeededSection');
+      const db = window.firebaseDB;
+      let html = '';
+
+      // Firebase에서 purchases 데이터 읽어오기
+      const purchasesRef = window.ref(db, 'purchases');
+      window.get(purchasesRef).then(snapshot => {
+        const purchasesData = snapshot.val() || {};
+
+        // collect keys that are marked as needed (exclude completed- keys)
+        const neededKeys = Object.keys(purchasesData).filter(k => !k.startsWith('completed-') && purchasesData[k] === true);
+
+        if (neededKeys.length === 0) {
+          section.innerHTML = '<p class="no-item">구매 필요 항목이 없습니다</p>';
+          return;
+        }
+
+        html = '';
+
+        // Partition keys into known product/material IDs and custom ones
+        const applianceIds = productData.appliances.map(p => p.id);
+        const materialIds = productData.materials.map(p => p.id);
+
+        const appliancesChecked = neededKeys.filter(k => applianceIds.includes(k));
+        const materialsChecked = neededKeys.filter(k => materialIds.includes(k));
+        const customChecked = neededKeys.filter(k => !applianceIds.includes(k) && !materialIds.includes(k));
+
+        if (appliancesChecked.length > 0) {
+          html += '<h3 style="color: #764ba2; margin-top: 0;">가전제품</h3>';
+          appliancesChecked.forEach(id => {
+            const product = productData.appliances.find(p => p.id === id) || { name: id };
+            const isCompleted = purchasesData[`completed-${id}`] === true;
+            const checkedAttr = isCompleted ? 'checked' : '';
+            const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
+            html += `
+              <div class="product-item">
+                <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${checkedAttr}>
+                <label for="completed-${id}" style="${strikeClass}">${product.name}</label>
+              </div>
+            `;
+          });
+        }
+
+        if (materialsChecked.length > 0) {
+          html += '<h3 style="color: #764ba2; margin-top: 20px;">인테리어 자재</h3>';
+          materialsChecked.forEach(id => {
+            const product = productData.materials.find(p => p.id === id) || { name: id };
+            const isCompleted = purchasesData[`completed-${id}`] === true;
+            const checkedAttr = isCompleted ? 'checked' : '';
+            const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
+            html += `
+              <div class="product-item">
+                <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${checkedAttr}>
+                <label for="completed-${id}" style="${strikeClass}">${product.name}</label>
+              </div>
+            `;
+          });
+        }
+
+        if (customChecked.length > 0) {
+          html += '<h3 style="color: #764ba2; margin-top: 20px;">기타 항목</h3>';
+          customChecked.forEach(id => {
+            // try to get label from purchases_labels
+            html += `
+              <div class="product-item" data-custom-id="${id}">
+                <input type="checkbox" id="completed-${id}" class="completion-checkbox" data-product-id="${id}" ${purchasesData[`completed-${id}`] ? 'checked' : ''}>
+                <label for="completed-${id}" style="${purchasesData[`completed-${id}`] ? 'text-decoration: line-through; color: #999;' : ''}">${id}</label>
+                <button class="delete-purchase" data-delete-id="${id}" style="margin-left:8px;background:#e74c3c;border:none;color:#fff;padding:4px 8px;border-radius:4px;cursor:pointer;">삭제</button>
+              </div>
+            `;
+          });
+        }
+
+        // add quick add UI for custom purchases
+        html = `<div style="margin-bottom:12px;"><input id="add-purchase-input" placeholder="구매 항목 추가" style="padding:6px;border:1px solid #ddd;border-radius:6px;margin-right:8px;"> <button id="add-purchase-btn" style="padding:6px 10px;border-radius:6px;background:#667eea;color:#fff;border:none;">추가</button></div>` + html;
+
+        section.innerHTML = html;
+
+        // populate any labels for custom items
+        window.get(window.ref(db, 'purchases_labels')).then(lblSnap => {
+          const labels = lblSnap.val() || {};
+          customChecked.forEach(id => {
+            const el = section.querySelector(`[data-custom-id="${id}"]`);
+            if (el && labels[id]) {
+              const labelEl = el.querySelector('label');
+              if (labelEl) labelEl.textContent = labels[id];
+            }
+          });
+        }).catch(()=>{});
+
+        // 체크박스 이벤트 리스너 추가
+        document.querySelectorAll('.completion-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            const productId = this.getAttribute('data-product-id');
+            const db = window.firebaseDB;
+            const completedRef = window.ref(db, `purchases/completed-${productId}`);
+            window.set(completedRef, this.checked).catch(error => {
+              console.error('Firebase 저장 오류:', error);
+            });
+            renderPurchaseList();
+          });
+        });
+
+        // add custom purchase
+        const addBtn = document.getElementById('add-purchase-btn');
+        const addInput = document.getElementById('add-purchase-input');
+        if (addBtn) {
+          addBtn.addEventListener('click', () => {
+            const text = addInput.value.trim();
+            if (!text) return;
+            const id = `custom-${Date.now()}`;
+            const db = window.firebaseDB;
+            window.set(window.ref(db, `purchases/${id}`), true).then(() => {
+              window.set(window.ref(db, `purchases_labels/${id}`), text);
+              renderPurchaseList();
+            }).catch(err => console.error(err));
+          });
+        }
+
+        // attach delete handlers for custom purchases
+        document.querySelectorAll('.delete-purchase').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-delete-id');
+            const db = window.firebaseDB;
+            // remove purchase and label
+            window.set(window.ref(db, `purchases/${id}`), null).then(() => {
+              return window.set(window.ref(db, `purchases_labels/${id}`), null);
+            }).then(() => renderPurchaseList()).catch(err => console.error(err));
+          });
+        });
+      }).catch(error => {
+        console.warn('Firebase 읽기 오류:', error);
+      });
+    }
+
+    // 체크리스트 기능 (다른 섹션들)
+    function createChecklistElement(id, text, checked, ul) {
+      // create li element with checkbox and label
+      const li = document.createElement('li');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.className = 'checklist-checkbox';
+      input.setAttribute('data-id', id);
+      input.id = id;
+      input.checked = !!checked;
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      label.textContent = text || id;
+      li.appendChild(input);
+      li.appendChild(label);
+      // if dynamic id (created by UI) allow deletion
+      if (id.includes('-dyn-')) {
+        const del = document.createElement('button');
+        del.textContent = '삭제';
+        del.style.marginLeft = '8px';
+        del.style.background = '#e74c3c';
+        del.style.color = '#fff';
+        del.style.border = 'none';
+        del.style.padding = '4px 8px';
+        del.style.borderRadius = '4px';
+        del.style.cursor = 'pointer';
+        del.className = 'delete-checklist-item';
+        del.setAttribute('data-delete-id', id);
+        li.appendChild(del);
+        del.addEventListener('click', () => {
+          const db = window.firebaseDB;
+          window.set(window.ref(db, `checklist_labels/${id}`), null).then(() => {
+            return window.set(window.ref(db, `checklist/${id}`), null);
+          }).then(() => {
+            li.remove();
+          }).catch(err => console.error(err));
+        });
+      }
+      ul.appendChild(li);
+
+      const db = window.firebaseDB;
+      const checklistRef = window.ref(db, `checklist/${id}`);
+
+      // initialize state
+      window.get(checklistRef).then(snapshot => {
+        if (snapshot.exists()) input.checked = snapshot.val();
+      }).catch(()=>{});
+
+      window.onValue(checklistRef, snapshot => {
+        if (snapshot.exists()) input.checked = snapshot.val();
+      });
+
+      input.addEventListener('change', function() {
+        window.set(window.ref(db, `checklist/${id}`), this.checked).catch(err => console.error(err));
+      });
+    }
+
+    function initChecklist() {
+      const checklistItems = document.querySelectorAll('.checklist');
+      const db = window.firebaseDB;
+
+      // ensure each static checkbox is wired
+      document.querySelectorAll('.checklist-checkbox').forEach(checkbox => {
+        const id = checkbox.getAttribute('data-id');
+        if (!id) return;
+        const checklistRef = window.ref(db, `checklist/${id}`);
+        window.get(checklistRef).then(snapshot => {
+          if (snapshot.exists()) checkbox.checked = snapshot.val();
+        }).catch(()=>{});
+        window.onValue(checklistRef, snapshot => {
+          if (snapshot.exists()) checkbox.checked = snapshot.val();
+        });
+        checkbox.addEventListener('change', function() {
+          window.set(window.ref(db, `checklist/${id}`), this.checked).catch(err => console.error(err));
+        });
+      });
+
+      // Load dynamic checklist labels and render into sections
+      window.get(window.ref(db, 'checklist_labels')).then(snapshot => {
+        const labels = snapshot.val() || {};
+        // for each label id, determine section by prefix before '-dyn-' or custom
+        Object.keys(labels).forEach(itemId => {
+          const parts = itemId.split('-');
+          const sectionKey = parts[0];
+          // find ul with id starting with checklistItems-<sectionKey>
+          const ul = document.getElementById(`checklistItems-${sectionKey}`);
+          if (ul) {
+            // avoid rendering if element with that id exists
+            if (!document.getElementById(itemId)) {
+              createChecklistElement(itemId, labels[itemId], false, ul);
+            }
+          }
+        });
+      }).catch(()=>{});
+
+      // attach UI to add new items per section (placed under the section title)
+      const sections = document.querySelectorAll('.section');
+      sections.forEach((section, idx) => {
+        if (section.id === 'purchaseNeededSection') return; // skip purchases area
+        // avoid adding duplicate container
+        if (section.querySelector('.add-item-container')) return;
+
+        // determine section key from previous heading (H2/H3)
+        const heading = section.previousElementSibling;
+        let sectionKey = `section${idx}`;
+        if (heading && (heading.tagName === 'H2' || heading.tagName === 'H3')) {
+          sectionKey = heading.textContent.trim().replace(/\s+/g, '_').replace(/[^\w\u3131-\uD79D_-]/g, '');
+        }
+
+        // ensure there's a checklist UL in this section
+        let ul = section.querySelector('.checklist');
+        if (!ul) {
+          // remove placeholder no-item paragraph if present
+          const noItem = section.querySelector('.no-item');
+          if (noItem) noItem.remove();
+          ul = document.createElement('ul');
+          ul.className = 'checklist';
+          ul.id = `checklistItems-${sectionKey}`;
+          section.insertBefore(ul, section.firstChild);
+        } else {
+          if (!ul.id) ul.id = `checklistItems-${sectionKey}`;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'add-item-container';
+        container.style.marginTop = '8px';
+        const input = document.createElement('input');
+        input.placeholder = '항목 추가';
+        input.style.padding = '6px';
+        input.style.border = '1px solid #ddd';
+        input.style.borderRadius = '6px';
+        input.style.marginRight = '8px';
+        const btn = document.createElement('button');
+        btn.textContent = '추가';
+        btn.style.padding = '6px 10px';
+        btn.style.borderRadius = '6px';
+        btn.style.background = '#667eea';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        container.appendChild(input);
+        container.appendChild(btn);
+
+        // insert under the title (section is directly after heading)
+        section.insertBefore(container, section.firstChild);
+
+        btn.addEventListener('click', () => {
+          const text = input.value.trim();
+          if (!text) return;
+          const itemId = `${sectionKey}-dyn-${Date.now()}`;
+          // save label and unchecked state
+          window.set(window.ref(db, `checklist_labels/${itemId}`), text).then(() => {
+            window.set(window.ref(db, `checklist/${itemId}`), false).then(() => {
+              createChecklistElement(itemId, text, false, ul);
+              input.value = '';
+            });
+          }).catch(err => console.error(err));
+        });
+      });
+    }
+
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      initChecklist();
+      renderPurchaseList();
+      
+      // Firebase purchases 변경 감시
+      const db = window.firebaseDB;
+      const purchasesRef = window.ref(db, 'purchases');
+      window.onValue(purchasesRef, () => {
+        renderPurchaseList();
+      });
+    });
+  </script>
+</body>
+</html>
