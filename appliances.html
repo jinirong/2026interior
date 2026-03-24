@@ -358,6 +358,27 @@
       }
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDawv_nbq55KBLfulK-cIf1DadH_xatS6g",
+      authDomain: "interior-13379.firebaseapp.com",
+      projectId: "interior-13379",
+      storageBucket: "interior-13379.firebasestorage.app",
+      messagingSenderId: "643636942253",
+      appId: "1:643636942253:web:1f442dfc5cbebc907c3d24",
+      databaseURL: "https://interior-13379-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    window.firebaseDB = database;
+  </script>
 </head>
 <body>
   <div class="container">
@@ -717,25 +738,38 @@
     }
 
     // 구매필요 체크박스 관리
-    function initPurchaseCheckboxes() {
+    async function initPurchaseCheckboxes() {
       const checkboxes = document.querySelectorAll('.purchase-checkbox');
       
-      // localStorage에서 상태 불러오기
+      // Firebase에서 상태 불러오기 및 실시간 동기화
       checkboxes.forEach(checkbox => {
         const productId = checkbox.getAttribute('data-product-id');
-        const isPurchaseNeeded = localStorage.getItem(`purchase-needed-${productId}`) === 'true';
-        if (isPurchaseNeeded) {
-          checkbox.checked = true;
-        }
-      });
-      
-      // 체크박스 변경 시 상태 저장 (check.html에도 알림)
-      checkboxes.forEach(checkbox => {
+        const db = window.firebaseDB;
+        const purchaseRef = ref(db, `purchases/${productId}`);
+        
+        // 초기 상태 불러오기
+        get(purchaseRef).then(snapshot => {
+          if (snapshot.exists()) {
+            checkbox.checked = snapshot.val();
+          }
+        }).catch(error => {
+          console.warn('Firebase 읽기 오류:', error);
+        });
+        
+        // 실시간 감시
+        onValue(purchaseRef, (snapshot) => {
+          if (snapshot.exists()) {
+            checkbox.checked = snapshot.val();
+          }
+        });
+        
+        // 체크박스 변경 시 Firebase에 저장
         checkbox.addEventListener('change', function() {
-          const productId = this.getAttribute('data-product-id');
-          localStorage.setItem(`purchase-needed-${productId}`, this.checked);
-          // check.html 페이지에 업데이트 알림
-          window.dispatchEvent(new CustomEvent('purchaseListUpdated'));
+          const db = window.firebaseDB;
+          const purchaseRef = ref(db, `purchases/${productId}`);
+          set(purchaseRef, this.checked).catch(error => {
+            console.error('Firebase 저장 오류:', error);
+          });
         });
       });
     }

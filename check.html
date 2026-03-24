@@ -186,6 +186,27 @@
       }
     }
   </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDawv_nbq55KBLfulK-cIf1DadH_xatS6g",
+      authDomain: "interior-13379.firebaseapp.com",
+      projectId: "interior-13379",
+      storageBucket: "interior-13379.firebasestorage.app",
+      messagingSenderId: "643636942253",
+      appId: "1:643636942253:web:1f442dfc5cbebc907c3d24",
+      databaseURL: "https://interior-13379-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    window.firebaseDB = database;
+  </script>
 </head>
 <body>
   <div class="container">
@@ -406,106 +427,126 @@
 
     function renderPurchaseList() {
       const section = document.getElementById('purchaseNeededSection');
+      const db = window.firebaseDB;
       let html = '';
-      let hasItems = false;
 
-      // Appliances
-      const appliancesChecked = productData.appliances.filter(item => 
-        localStorage.getItem(`purchase-needed-${item.id}`) === 'true'
-      );
+      // Firebase에서 purchases 데이터 읽어오기
+      const purchasesRef = ref(db, 'purchases');
+      get(purchasesRef).then(snapshot => {
+        const purchasesData = snapshot.val() || {};
+        
+        // Appliances
+        const appliancesChecked = productData.appliances.filter(item => purchasesData[item.id] === true);
 
-      // Materials
-      const materialsChecked = productData.materials.filter(item => 
-        localStorage.getItem(`purchase-needed-${item.id}`) === 'true'
-      );
+        // Materials
+        const materialsChecked = productData.materials.filter(item => purchasesData[item.id] === true);
 
-      if (appliancesChecked.length === 0 && materialsChecked.length === 0) {
-        section.innerHTML = '<p class="no-item">구매 필요 항목이 없습니다</p>';
-        return;
-      }
+        if (appliancesChecked.length === 0 && materialsChecked.length === 0) {
+          section.innerHTML = '<p class="no-item">구매 필요 항목이 없습니다</p>';
+          return;
+        }
 
-      // Appliances section
-      if (appliancesChecked.length > 0) {
-        html += '<h3 style="color: #764ba2; margin-top: 0;">가전제품</h3>';
-        appliancesChecked.forEach(item => {
-          const isCompleted = localStorage.getItem(`purchase-completed-${item.id}`) === 'true';
-          const checkedAttr = isCompleted ? 'checked' : '';
-          const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
-          
-          html += `
-            <div class="product-item">
-              <input type="checkbox" id="completed-${item.id}" class="completion-checkbox" data-product-id="${item.id}" ${checkedAttr}>
-              <label for="completed-${item.id}" style="${strikeClass}">${item.name}</label>
-            </div>
-          `;
+        html = '';
+
+        // Appliances section
+        if (appliancesChecked.length > 0) {
+          html += '<h3 style="color: #764ba2; margin-top: 0;">가전제품</h3>';
+          appliancesChecked.forEach(item => {
+            const isCompleted = purchasesData[`completed-${item.id}`] === true;
+            const checkedAttr = isCompleted ? 'checked' : '';
+            const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
+            
+            html += `
+              <div class="product-item">
+                <input type="checkbox" id="completed-${item.id}" class="completion-checkbox" data-product-id="${item.id}" ${checkedAttr}>
+                <label for="completed-${item.id}" style="${strikeClass}">${item.name}</label>
+              </div>
+            `;
+          });
+        }
+
+        // Materials section
+        if (materialsChecked.length > 0) {
+          html += '<h3 style="color: #764ba2; margin-top: 20px;">인테리어 자재</h3>';
+          materialsChecked.forEach(item => {
+            const isCompleted = purchasesData[`completed-${item.id}`] === true;
+            const checkedAttr = isCompleted ? 'checked' : '';
+            const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
+            
+            html += `
+              <div class="product-item">
+                <input type="checkbox" id="completed-${item.id}" class="completion-checkbox" data-product-id="${item.id}" ${checkedAttr}>
+                <label for="completed-${item.id}" style="${strikeClass}">${item.name}</label>
+              </div>
+            `;
+          });
+        }
+
+        section.innerHTML = html;
+
+        // 체크박스 이벤트 리스너 추가
+        document.querySelectorAll('.completion-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('change', function() {
+            const productId = this.getAttribute('data-product-id');
+            const db = window.firebaseDB;
+            const completedRef = ref(db, `purchases/completed-${productId}`);
+            set(completedRef, this.checked).catch(error => {
+              console.error('Firebase 저장 오류:', error);
+            });
+            renderPurchaseList();
+          });
         });
-      }
-
-      // Materials section
-      if (materialsChecked.length > 0) {
-        html += '<h3 style="color: #764ba2; margin-top: 20px;">인테리어 자재</h3>';
-        materialsChecked.forEach(item => {
-          const isCompleted = localStorage.getItem(`purchase-completed-${item.id}`) === 'true';
-          const checkedAttr = isCompleted ? 'checked' : '';
-          const strikeClass = isCompleted ? 'text-decoration: line-through; color: #999;' : '';
-          
-          html += `
-            <div class="product-item">
-              <input type="checkbox" id="completed-${item.id}" class="completion-checkbox" data-product-id="${item.id}" ${checkedAttr}>
-              <label for="completed-${item.id}" style="${strikeClass}">${item.name}</label>
-            </div>
-          `;
-        });
-      }
-
-      section.innerHTML = html;
-
-      // 체크박스 이벤트 리스너 추가
-      document.querySelectorAll('.completion-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          const productId = this.getAttribute('data-product-id');
-          localStorage.setItem(`purchase-completed-${productId}`, this.checked);
-          renderPurchaseList();
-        });
+      }).catch(error => {
+        console.warn('Firebase 읽기 오류:', error);
       });
     }
 
     // 체크리스트 기능 (다른 섹션들)
     function initChecklist() {
       const checklistItems = document.querySelectorAll('.checklist-checkbox');
+      const db = window.firebaseDB;
       
-      // 저장된 상태 불러오기
       checklistItems.forEach(checkbox => {
         const id = checkbox.getAttribute('data-id');
-        const isChecked = localStorage.getItem(id) === 'true';
-        if (isChecked) {
-          checkbox.checked = true;
-        }
-      });
-      
-      // 체크박스 변경 시 상태 저장
-      checklistItems.forEach(checkbox => {
+        const checklistRef = ref(db, `checklist/${id}`);
+        
+        // 초기 상태 불러오기
+        get(checklistRef).then(snapshot => {
+          if (snapshot.exists()) {
+            checkbox.checked = snapshot.val();
+          }
+        }).catch(error => {
+          console.warn('Firebase 읽기 오류:', error);
+        });
+        
+        // 실시간 감시
+        onValue(checklistRef, (snapshot) => {
+          if (snapshot.exists()) {
+            checkbox.checked = snapshot.val();
+          }
+        });
+        
+        // 체크박스 변경 시 Firebase에 저장
         checkbox.addEventListener('change', function() {
-          const id = this.getAttribute('data-id');
-          localStorage.setItem(id, this.checked);
+          const checklistRef = ref(db, `checklist/${id}`);
+          set(checklistRef, this.checked).catch(error => {
+            console.error('Firebase 저장 오류:', error);
+          });
         });
       });
     }
 
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', () => {
-      renderPurchaseList();
       initChecklist();
-    });
-
-    // 다른 탭에서 구매필요 상태 변경 감지
-    window.addEventListener('storage', () => {
       renderPurchaseList();
-    });
-
-    // 같은 탭에서 이벤트 감지
-    window.addEventListener('purchaseListUpdated', () => {
-      renderPurchaseList();
+      
+      // Firebase purchases 변경 감시
+      const db = window.firebaseDB;
+      const purchasesRef = ref(db, 'purchases');
+      onValue(purchasesRef, () => {
+        renderPurchaseList();
+      });
     });
   </script>
 </body>
