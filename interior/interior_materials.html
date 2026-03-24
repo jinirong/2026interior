@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인테리어 자재 목록</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        th {
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #555;
+            vertical-align: middle;
+        }
+        
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: #f5f5f5;
+            transform: translateX(5px);
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .image-cell {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .image-cell img {
+            max-width: 70px;
+            max-height: 70px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .image-cell img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .image-placeholder {
+            width: 70px;
+            height: 70px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            color: #999;
+            margin: 0 auto;
+        }
+        
+        .material-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .product-name {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .product-name.undefined {
+            color: #999;
+            font-style: italic;
+        }
+        
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: auto;
+            animation: slideIn 0.3s;
+            position: relative;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+            
+            .image-cell img {
+                max-width: 50px;
+                max-height: 50px;
+            }
+            
+            .image-placeholder {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDawv_nbq55KBLfulK-cIf1DadH_xatS6g",
+            authDomain: "interior-13379.firebaseapp.com",
+            projectId: "interior-13379",
+            storageBucket: "interior-13379.firebasestorage.app",
+            messagingSenderId: "643636942253",
+            appId: "1:643636942253:web:1f442dfc5cbebc907c3d24",
+            databaseURL: "https://interior-13379-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.firebaseDB = database;
+        window.ref = ref;
+        window.set = set;
+        window.get = get;
+        window.onValue = onValue;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="back-button">
+            <a href="index.html">← 돌아가기</a>
+        </div>
+        
+        <h1>✅ 인테리어 자재 목록</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">구매필요</th>
+                    <th style="width: 100px;">사진</th>
+                    <th style="width: 150px;">자재명</th>
+                    <th>제품명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-product-id="mat-도어손잡이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-도어손잡이">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/도어손잡이.png" alt="도어손잡이" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">도어손잡이</div>
+                    </td>
+                    <td>
+                        <div class="product-name">도무스 511 NI</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-양변기">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-양변기">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/양변기(거실,안방).png" alt="양변기" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">양변기</div>
+                    </td>
+                    <td>
+                        <div class="product-name">대림바스 CC734 투피스 치마형 림리스 양변기</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-세면기_거실">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-세면기_거실">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/세면대(거실).png" alt="세면기 거실" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">세면기 (거실)</div>
+                    </td>
+                    <td>
+                        <div class="product-name">필로토 이시스벽걸이 3119</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-세면대_안방">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-세면대_안방">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/세면대(안방).png" alt="세면대 안방" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">세면대 (안방)</div>
+                    </td>
+                    <td>
+                        <div class="product-name">누오보 세면대 유광 화이트 벽걸이 세면기 183</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-세면수전">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-세면수전">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/세면수전.png" alt="세면수전" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">세면수전</div>
+                    </td>
+                    <td>
+                        <div class="product-name">비반트 CA340 MS/BS SANTE 원홀세면수전 매트실버</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-샤워욕조수전_거실">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-샤워욕조수전_거실">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/샤워욕조수전(거실).png" alt="샤워욕조수전 거실" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">샤워욕조수전 (거실)</div>
+                    </td>
+                    <td>
+                        <div class="product-name">대림바스 샤워 욕조수전 무광니켈 NERA SIRIES DL-B4112SN</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-샤워욕조수전_안방">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-샤워욕조수전_안방">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/샤워욕조수전(안방).png" alt="샤워욕조수전 안방" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">샤워욕조수전 (안방)</div>
+                    </td>
+                    <td>
+                        <div class="product-name">무광 니켈 샤워수전 선반 샤워기 J one-3000 디럭스 수전형 (벽 홀더 사용 X, 슬라이드바로 대체)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-슬라이드바">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-슬라이드바">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/슬라이드바.png" alt="슬라이드바" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">슬라이드바</div>
+                    </td>
+                    <td>
+                        <div class="product-name">비반트 슬라이드바 무광 니켈 샤워기 거치대 CA307 MS</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-휴지걸이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-휴지걸이">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/휴지걸이.png" alt="휴지걸이" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">휴지걸이</div>
+                    </td>
+                    <td>
+                        <div class="product-name">N1208TNI 국산 트레이 매립휴지걸이 니켈 사틴 휴대폰 핸드폰 거치</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-포인트욕실옷걸이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-포인트욕실옷걸이">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/포인트옷걸이.png" alt="포인트옷걸이" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">포인트 욕실옷걸이</div>
+                    </td>
+                    <td>
+                        <div class="product-name">블루발코니 플라워 후크 블랙/화이트</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-샤워볼걸이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-샤워볼걸이">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/샤워볼걸이.png" alt="샤워볼걸이" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">샤워볼걸이</div>
+                    </td>
+                    <td>
+                        <div class="product-name"><del>비반트 TC01E MS 옷걸이 매트실버</del> <br> -> 업체 무상 제공</div>
+                    </td>
+                </tr>
+
+                <tr data-product-id="mat-욕실선반">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-욕실선반">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/욕실선반.jpg" alt="욕실선반" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">욕실선반</div>
+                    </td>
+                    <td>
+                        <div class="product-name">제시 일자선반 300</div>
+                    </td>
+                </tr>
+
+                <tr data-product-id="mat-수건걸이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-수건걸이">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/수건걸이.png" alt="수건걸이" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">수건걸이</div>
+                    </td>
+                    <td>
+                        <div class="product-name">비반트 TC01A MS 수건걸이 매트실버</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-유가">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-유가">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/유가.png" alt="유가" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">유가</div>
+                    </td>
+                    <td>
+                        <div class="product-name"><del>도무스 육가 T (봉수타입)</del>  화신라우체 HJK032FYL 45P 라인 유가</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-주방수전">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-주방수전">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/주방수전.png" alt="주방수전" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">주방수전</div>
+                    </td>
+                    <td>
+                        <div class="product-name">에떼르노 EK-6003 NBM 무광 니캘 싱크대 거위목 수전</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-싱크대">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-싱크대">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/싱크대.png" alt="싱크대" onclick="openModal(this)">
+                    </td>
+                    <td>
+                        <div class="material-name">싱크대</div>
+                    </td>
+                    <td>
+                        <div class="product-name">백조 고니 사각볼 ECNR8310 엠보 랜디배수구 언더 씽크볼</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-욕조안전바">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-욕조안전바">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">욕조 안전바</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(미정)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-방충망">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-방충망">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">방충망</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(미정)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-붙박이장_손잡이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-붙박이장_손잡이">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">붙박이장 손잡이</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(미정)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-현관장_손잡이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-현관장_손잡이">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">현관장 손잡이</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(미정)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-폴딩도어_손잡이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-폴딩도어_손잡이">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">폴딩도어 손잡이</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(미정)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-아일랜드_손잡이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-아일랜드_손잡이">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">아일랜드 손잡이</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(미정)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-샤시손잡이">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-샤시손잡이">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">샤시손잡이</div>
+                    </td>
+                    <td>
+                        <div class="product-name undefined">(별도로 진행)</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-스위치">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-스위치">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">스위치</div>
+                    </td>
+                    <td>
+                        <div class="product-name"><a href="switches_outlets.html" target="_blank">switches_outlets.html 참고</a></div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-콘센트">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-콘센트">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">콘센트</div>
+                    </td>
+                    <td>
+                        <div class="product-name"><a href="switches_outlets.html" target="_blank">switches_outlets.html 참고</a></div>
+                    </td>
+                </tr>
+ 
+                <tr data-product-id="mat-도어스토퍼">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-도어스토퍼">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">도어스토퍼</div>
+                    </td>
+                    <td>
+                        <div class="product-name">바닥 자석형</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-방_직부등">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-방_직부등">
+                    </td>
+                    <td class="image-cell">
+                        <img src="images/materials/방 직부등.png" alt="방 직부등" onclick="openModal(this)">                    </td>
+                    <td>
+                        <div class="material-name">방 직부등</div>
+                    </td>
+                    <td>
+                        <div class="product-name">몽돌전등</div>
+                    </td>
+                </tr>
+                
+                <tr data-product-id="mat-발코니_직부등">
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="purchase-checkbox" data-product-id="mat-발코니_직부등">
+                    </td>
+                    <td class="image-cell">
+                        <div class="image-placeholder">이미지<br>미정</div>
+                    </td>
+                    <td>
+                        <div class="material-name">발코니 직부등</div>
+                    </td>
+                    <td>
+                        <div class="product-name">제안서 상 기본 직부등</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 이미지 모달 -->
+    <div id="imageModal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <img id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        function openModal(imgElement) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = imgElement.src;
+            modal.classList.add('show');
+        }
+
+        function closeModal(event) {
+            const modal = document.getElementById('imageModal');
+            if (event && event.target !== modal) return;
+            modal.classList.remove('show');
+        }
+
+        // 구매필요 체크박스 관리
+        async function initPurchaseCheckboxes() {
+            const checkboxes = document.querySelectorAll('.purchase-checkbox');
+            
+            // Firebase에서 상태 불러오기 및 실시간 동기화
+            checkboxes.forEach(checkbox => {
+                const productId = checkbox.getAttribute('data-product-id');
+                const db = window.firebaseDB;
+                const purchaseRef = ref(db, `purchases/${productId}`);
+                
+                // 초기 상태 불러오기
+                get(purchaseRef).then(snapshot => {
+                    if (snapshot.exists()) {
+                        checkbox.checked = snapshot.val();
+                    }
+                }).catch(error => {
+                    console.warn('Firebase 읽기 오류:', error);
+                });
+                
+                // 실시간 감시
+                onValue(purchaseRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        checkbox.checked = snapshot.val();
+                    }
+                });
+                
+                // 체크박스 변경 시 Firebase에 저장
+                checkbox.addEventListener('change', function() {
+                    const db = window.firebaseDB;
+                    const purchaseRef = ref(db, `purchases/${productId}`);
+                    set(purchaseRef, this.checked).catch(error => {
+                        console.error('Firebase 저장 오류:', error);
+                    });
+                });
+            });
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', initPurchaseCheckboxes);
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
