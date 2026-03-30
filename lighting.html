@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>조명</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 1200px;
+      width: 100%;
+    }
+    
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.3em;
+      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.5px;
+    }
+    
+    h2 {
+      color: #333;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .image-section {
+      text-align: left;
+      margin-bottom: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .thumbnail-img {
+      max-width: 300px;
+      max-height: 300px;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .thumbnail-img:hover {
+      transform: scale(1.05);
+    }
+
+    .image-placeholder {
+      width: 300px;
+      height: 300px;
+      background: #f5f5f5;
+      border: 2px dashed #667eea;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1em;
+      color: #999;
+      margin: 0 auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .image-placeholder:hover {
+      background: #f9f9f9;
+      border-color: #764ba2;
+    }
+
+    .image-cell {
+      width: 100px;
+      text-align: center;
+    }
+
+    .image-cell img {
+      max-width: 80px;
+      max-height: 80px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .image-cell img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow: auto;
+      animation: slideIn 0.3s;
+      position: relative;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #999;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    th {
+      color: white;
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 1.05em;
+    }
+    
+    td {
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
+      color: #555;
+    }
+    
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:hover {
+      background-color: #f5f5f5;
+      transform: translateX(5px);
+    }
+    
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .back-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+      }
+      
+      h2 {
+        font-size: 1.3em;
+      }
+      
+      .subtitle {
+        font-size: 1.05em;
+        margin-bottom: 20px;
+      }
+      
+      th, td {
+        padding: 12px;
+        font-size: 0.95em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><span style="color: #667eea;">💡</span> 조명</h1>
+
+    <h2>조명</h2>
+    <div class="image-section">
+      <img class="thumbnail-img" src="images/lighting/lighting_0311.png" alt="조명 배치도" onclick="openModal(this)">
+      <div style="flex-basis: 100%;"></div>
+      <img class="thumbnail-img" src="images/lighting/조명리스트.png" alt="조명 리스트" onclick="openModal(this)">
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 100px;">사진</th>
+          <th>위치</th>
+          <th>조명 종류</th>
+          <th>제품</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting1.png" alt="현관 센서등" onclick="openModal(this)">
+          </td>
+          <td>현관</td>
+          <td>센서등 (+스위치)</td>
+          <td></td>
+          <td>현관 천정에 설치</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting2.png" alt="거실 2인치매입등" onclick="openModal(this)">
+          </td>
+          <td>거실</td>
+          <td>2인치매입등(COB)</td>
+          <td></td>
+          <td>메인 조명</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting3.png" alt="거실 커튼간접" onclick="openModal(this)">
+          </td>
+          <td>거실</td>
+          <td>커튼간접</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting4.png" alt="주방 2인치매입등" onclick="openModal(this)">
+          </td>
+          <td>주방</td>
+          <td>2인치매입등(COB)</td>
+          <td></td>
+          <td>주방 천정 조명</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting5.png" alt="주방 멀티매입등" onclick="openModal(this)">
+          </td>
+          <td>주방</td>
+          <td>멀티매입등</td>
+          <td></td>
+          <td>주방 아일랜드 조명</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting6.png" alt="주방 주방간접" onclick="openModal(this)">
+          </td>
+          <td>주방</td>
+          <td>주방간접</td>
+          <td></td>
+          <td>작업 대 조명</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting7.png" alt="안방 직부등" onclick="openModal(this)">
+          </td>
+          <td>안방</td>
+          <td>직부등</td>
+          <td></td>
+          <td>천정 메인 조명</td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting8.png" alt="안방 커튼간접" onclick="openModal(this)">
+          </td>
+          <td>안방</td>
+          <td>커튼간접</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting9.png" alt="드레스룸 직부등" onclick="openModal(this)">
+          </td>
+          <td>드레스룸</td>
+          <td>직부등</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting10.png" alt="화장대 파우더룸 2인치매입등" onclick="openModal(this)">
+          </td>
+          <td>화장대, 파우더룸</td>
+          <td>2인치매입등(COB)</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting11.png" alt="작은방 서재 직부등" onclick="openModal(this)">
+          </td>
+          <td>작은방(서재)</td>
+          <td>직부등</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting12.png" alt="작은방 게스트룸 직부등" onclick="openModal(this)">
+          </td>
+          <td>작은방(게스트룸)</td>
+          <td>직부등</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting13.png" alt="욕실 2인치매입등 간접조명" onclick="openModal(this)">
+          </td>
+          <td>욕실</td>
+          <td>2인치매입등(COB), 간접조명</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="image-cell">
+            <img src="images/lighting/lighting14.png" alt="발코니 직부등" onclick="openModal(this)">
+          </td>
+          <td>발코니</td>
+          <td>직부등</td>
+          <td></td>
+          <td>발코니 조명</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 모달 -->
+    <div id="imageModal" class="modal">
+      <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        <img id="modalImg" src="" alt="확대 이미지">
+      </div>
+    </div>
+
+    <a href="index.html" class="back-link">← 돌아가기</a>
+  </div>
+
+  <script>
+    // 테이블 항목 이미지 클릭 시 모달 열기 (onclick 사용)
+    function openModal(imgElement) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      modalImg.src = imgElement.src;
+      modal.classList.add('show');
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('imageModal').classList.remove('show');
+    }
+
+    // 모달 배경 클릭 시 닫기
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
